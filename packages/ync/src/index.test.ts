@@ -11,6 +11,7 @@ import {
   $intersection,
   $union,
   Infer,
+  $literal,
 } from "./index";
 
 function success<T>(actual: T) {
@@ -706,6 +707,21 @@ test("intersection", () => {
   ).toStrictEqual(success(1));
 });
 
+test("literal", () => {
+  expect($literal(null).parse(null)).toStrictEqual(success(null));
+  expect($literal(undefined).parse(undefined)).toStrictEqual(
+    success(undefined),
+  );
+  expect($literal(true).parse(true)).toStrictEqual(success(true));
+  expect($literal(1).parse(1)).toStrictEqual(success(1));
+  expect($literal(NaN).parse(NaN)).toStrictEqual(success(NaN));
+  expect($literal("test").parse("test")).toStrictEqual(success("test"));
+  expect($literal(1).parse("1")).toStrictEqual(success(1));
+  expect($literal(true).parse("true")).toStrictEqual(success(true));
+  //object literal not implemented
+  //expect($literal({ a: "test" }).parse(true)).toStrictEqual(success({a: "test"));
+});
+
 test("nullable", () => {
   expect($nullable($number).parse(undefined)).toStrictEqual(success(undefined));
   expect($nullable($number).parse(null)).toStrictEqual(success(null));
@@ -739,5 +755,26 @@ test("nested_error", () => {
       error("malformed_value", ["nest", "ary", 4]),
       error("malformed_value", ["other", 1, "a"]),
     ),
+  );
+});
+
+test("complex", () => {
+  const union = $union([
+    $object({
+      flag: $literal(true),
+      value: $string,
+    }),
+    $object({
+      flag: $literal(false),
+    }),
+  ]);
+
+  expect(union.parse({ flag: true, value: "hello" })).toStrictEqual(
+    success({ flag: true, value: "hello" }),
+  );
+  expect(union.parse({ flag: false })).toStrictEqual(success({ flag: false }));
+
+  expect(union.parse({ flag: false, value: "test" })).toStrictEqual(
+    failure(error("malformed_value", ["flag"]), error("malformed_value")),
   );
 });

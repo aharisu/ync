@@ -730,6 +730,65 @@ export function $intersection<Ts extends Array<Parser<any>>>(
 }
 
 //
+// $literal
+//
+
+function literalParse<T>(
+  literal: T,
+  input: unknown,
+  ctx: ParseContext | undefined,
+): Result<T> {
+  ctx = createParseContext(ctx);
+
+  let match = false;
+  if (Object.is(literal, input)) {
+    match = true;
+  } else if (input === undefined || input === null) {
+    match = false;
+  } else if (typeof literal === "object") {
+    if (typeof input === "object") {
+      //TODO deep equal
+    }
+  } else if (typeof literal === "number") {
+    if (typeof input === "string") {
+      const number = Number(input);
+      match = Object.is(literal, number);
+    }
+  } else if (typeof literal === "boolean") {
+    if (typeof input === "string") {
+      const bool = stringToBoolean(input);
+      match = Object.is(literal, bool);
+    }
+  } else if (typeof literal === "string") {
+    match = Object.is(literal, String(input));
+  }
+
+  if (match) {
+    return success(ctx, literal);
+  } else {
+    return { success: false, errors: createError(ctx, "malformed_value") };
+  }
+}
+
+type Literal<T> = T extends readonly any[]
+  ? T extends [infer Head, ...infer Tail]
+    ? [Literal<Head>, ...Literal<Tail>]
+    : []
+  : T extends object
+  ? { [K in keyof T]: Literal<T[K]> }
+  : T extends string | number | boolean | undefined | null
+  ? T
+  : never;
+
+export function $literal<T>(literal: Literal<T>): Parser<Literal<T>> {
+  const parser = {
+    parse: (input: unknown, ctx?: ParseContext) =>
+      literalParse(literal, input, ctx),
+  };
+  return parser;
+}
+
+//
 // $nullable
 //
 

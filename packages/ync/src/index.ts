@@ -8,5 +8,6 @@ export {
   $array,
   $union,
   $intersection,
+  $literal,
   $nullable,
 } from "./Parser";

@@ -1,4 +1,4 @@
-import { $array, $boolean, $number, $object, $string, Parser } from "src";
+import { $array, $boolean, $literal, $number, $object, $string, $union, Parser } from "src";
 import { expectTypeOf, test } from "vitest";
 
 test("number", () => {
@@ -107,4 +107,35 @@ test("array", () => {
   expectTypeOf(
     $array($number, { nullable: true, default: undefined }),
   ).toEqualTypeOf<Parser<number[] | null | undefined>>();
+});
+
+test("literal", () => {
+  expectTypeOf($literal(null)).toEqualTypeOf<Parser<null>>();
+  expectTypeOf($literal(undefined)).toEqualTypeOf<Parser<undefined>>();
+  expectTypeOf($literal(1)).toEqualTypeOf<Parser<1>>();
+  expectTypeOf($literal(3.14)).toEqualTypeOf<Parser<3.14>>();
+  expectTypeOf(
+    $literal({ a: "hello", b: "world", c: { d: "!!" } }),
+  ).toEqualTypeOf<Parser<{ a: "hello"; b: "world"; c: { d: "!!" } }>>();
+
+  expectTypeOf(
+    $literal([1, "2", 3.14, true, { a: "hello", b: ["world"] }]),
+  ).toEqualTypeOf<Parser<[1, "2", 3.14, true, { a: "hello"; b: ["world"] }]>>();
+
+  //NaN is not literal
+  expectTypeOf($literal(NaN)).toEqualTypeOf<Parser<number>>();
+});
+
+test("complex", () => {
+  expectTypeOf(
+    $union([
+      $object({
+        flag: $literal(true),
+        value: $string,
+      }),
+      $object({
+        flag: $literal(false),
+      }),
+    ]),
+  ).toEqualTypeOf<Parser<{ flag: true; value: string } | { flag: false }>>();
 });
