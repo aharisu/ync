@@ -686,10 +686,10 @@ function merge(base: unknown, other: unknown): unknown {
           return numBase;
         }
       } else if (
-        //このパーサーの仕様では、booleanはstringの部分集合になるため、booleanとstringをマージ可能にする
         (typeof other === "boolean" && typeof base === "string") ||
         (typeof other === "string" && typeof base === "boolean")
       ) {
+        //このパーサーの仕様では、booleanはstringの部分集合になるため、booleanとstringをマージ可能にする
         const boolBase =
           typeof base === "boolean" ? base : stringToBoolean(base);
         const boolOther =
