@@ -10,4 +10,5 @@ export {
   $intersection,
   $literal,
   $nullable,
+  $optional,
 } from "./Parser";

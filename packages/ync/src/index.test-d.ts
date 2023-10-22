@@ -1,4 +1,4 @@
-import { $array, $boolean, $literal, $number, $object, $string, $union, Parser } from "src";
+import { $array, $boolean, $literal, $number, $object, $optional, $string, $union, Parser } from "src";
 import { expectTypeOf, test } from "vitest";
 
 test("number", () => {
@@ -135,7 +135,8 @@ test("complex", () => {
       }),
       $object({
         flag: $literal(false),
+        value: $optional($string),
       }),
     ]),
-  ).toEqualTypeOf<Parser<{ flag: true; value: string } | { flag: false }>>();
+  ).toEqualTypeOf<Parser<{ flag: true; value: string } | { flag: false, value?: string }>>();
 });

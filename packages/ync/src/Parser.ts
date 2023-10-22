@@ -379,11 +379,19 @@ $boolean.parse = ((input: unknown, ctx?: ParseContext) =>
 // $object
 //
 
+// Hack to get TypeScript to show simplified types in error messages
+type Pretty<T> = { [K in keyof T]: T[K] } & {};
+
+type ObjectMapInfer<Map extends Record<string, Parser<any>>> = Pretty<
+  { [K in keyof Map as Map[K] extends OptionalParser<any> ? never : K]: Infer<Map[K]> } &
+  { [K in keyof Map as Map[K] extends OptionalParser<any> ? K : never]?: Infer<Map[K]> }
+>;
+
 type ObjectParserOptions<Map extends Record<string, Parser<any>>> = {
-  default?: { [K in keyof Map]: Infer<Map[K]> };
+  default?: ObjectMapInfer<Map>;
   nullable?: boolean;
   exact?: boolean;
-  validate?: Validator<{ [K in keyof Map]: Infer<Map[K]> }>;
+  validate?: Validator<ObjectMapInfer<Map>>;
 };
 
 function objectParse<Map extends Record<string, Parser<any>>>(
@@ -391,7 +399,7 @@ function objectParse<Map extends Record<string, Parser<any>>>(
   options: ObjectParserOptions<Map>,
   input: unknown,
   ctx: ParseContext | undefined,
-): MaybeNullableResult<{ [K in keyof Map]: Infer<Map[K]> }> {
+): MaybeNullableResult<ObjectMapInfer<Map>> {
   ctx = createParseContext(ctx);
 
   if (isNullOrUndef(input)) {
@@ -417,7 +425,7 @@ function objectParse<Map extends Record<string, Parser<any>>>(
     return { success: false, errors: createError(ctx, "malformed_value") };
   }
 
-  const parsedObj = {} as { [K in keyof Map]: Infer<Map[K]> };
+  const parsedObj = {} as ObjectMapInfer<Map>;
   pushParent(ctx, parsedObj);
 
   const unchecked = new Set(Object.keys(input!));
@@ -427,13 +435,18 @@ function objectParse<Map extends Record<string, Parser<any>>>(
     if (key === "__proto__") {
       continue;
     }
-    const item = (input as Record<string, any>)[key];
-    ctx.name = key;
-    const result = (parser.parse as ParseFuncInternal)(item, ctx);
-    if (result.success) {
-      parsedObj[key as keyof Map] = result.value;
+
+    if(isOptionalParser(parser) && (key in (input as Record<string, any>)) === false) {
+      //optionalなプロパティに対して、対応する入力フィールドが存在しなくてもOKなのでここでは何もしない
     } else {
-      failed = true;
+      const item = (input as Record<string, any>)[key];
+      ctx.name = key;
+      const result = (parser.parse as ParseFuncInternal)(item, ctx);
+      if (result.success) {
+        parsedObj[key as keyof ObjectMapInfer<Map>] = result.value;
+      } else {
+        failed = true;
+      }
     }
     unchecked.delete(key);
   }
@@ -460,17 +473,17 @@ function objectParse<Map extends Record<string, Parser<any>>>(
 export function $object<Map extends Record<string, Parser<any>>>(
   map: Map,
   options: NullableOptions & ObjectParserOptions<Map>,
-): NullableParser<{ [K in keyof Map]: Infer<Map[K]> }>;
+): NullableParser<ObjectMapInfer<Map>>;
 
 export function $object<Map extends Record<string, Parser<any>>>(
   map: Map,
   options?: ObjectParserOptions<Map>,
-): Parser<{ [K in keyof Map]: Infer<Map[K]> }>;
+): Parser<ObjectMapInfer<Map>>;
 
 export function $object<Map extends Record<string, Parser<any>>>(
   map: Map,
   options?: ObjectParserOptions<Map>,
-): MaybeNullableParser<{ [K in keyof Map]: Infer<Map[K]> }> {
+): MaybeNullableParser<ObjectMapInfer<Map>> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
       objectParse(map, options ?? {}, input, ctx),
@@ -628,8 +641,8 @@ type TupleToIntersection<T extends any[]> = {
   ? R
   : never;
 
-type MapInfer<T> = T extends [infer x, ...infer xs]
-  ? [Infer<x>, ...MapInfer<xs>]
+type ArrayMapInfer<T> = T extends [infer x, ...infer xs]
+  ? [Infer<x>, ...ArrayMapInfer<xs>]
   : [];
 
 function merge(base: unknown, other: unknown): unknown {
@@ -695,7 +708,7 @@ function parseIntersection<Ts extends Array<Parser<any>>>(
   parsers: readonly [...Ts],
   input: unknown,
   ctx: ParseContext | undefined,
-): Result<TupleToIntersection<MapInfer<Ts>>> {
+): Result<TupleToIntersection<ArrayMapInfer<Ts>>> {
   ctx = createParseContext(ctx);
 
   let value = undefined;
@@ -715,13 +728,13 @@ function parseIntersection<Ts extends Array<Parser<any>>>(
   if (value === undefined) {
     return { success: false, errors: createError(ctx, "malformed_value") };
   } else {
-    return success(ctx, value as TupleToIntersection<MapInfer<Ts>>);
+    return success(ctx, value as TupleToIntersection<ArrayMapInfer<Ts>>);
   }
 }
 
 export function $intersection<Ts extends Array<Parser<any>>>(
   parsers: readonly [...Ts],
-): Parser<TupleToIntersection<MapInfer<Ts>>> {
+): Parser<TupleToIntersection<ArrayMapInfer<Ts>>> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
       parseIntersection(parsers, input, ctx),
@@ -809,6 +822,39 @@ export function $nullable<T>(inner: Parser<T>): Parser<T | null | undefined> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
       parseNullable(inner, input, ctx),
+  };
+  return parser;
+}
+
+//
+// $optional
+//
+
+interface OptionalParser<T> extends Parser<T | undefined> {
+  isOptional: true;
+}
+
+function isOptionalParser<T>(parser: Parser<T | undefined>): parser is OptionalParser<T> {
+  return (parser as OptionalParser<T>).isOptional === true;
+}
+
+function parseOptional<T>(
+  inner: Parser<T>,
+  input: unknown,
+  ctx?: ParseContext,
+): Result<T | undefined> {
+  ctx = createParseContext(ctx);
+  if (typeof input === "undefined") {
+    return success(ctx, input);
+  } else {
+    return (inner.parse as ParseFuncInternal)(input, ctx);
+  }
+}
+
+export function $optional<T>(inner: Parser<T>): OptionalParser<T> {
+  const parser = {
+    isOptional: true as const,
+    parse: (input: unknown, ctx?: ParseContext) => parseOptional(inner, input, ctx),
   };
   return parser;
 }

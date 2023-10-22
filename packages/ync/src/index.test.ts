@@ -12,6 +12,7 @@ import {
   $union,
   Infer,
   $literal,
+  $optional,
 } from "./index";
 
 function success<T>(actual: T) {
@@ -766,6 +767,7 @@ test("complex", () => {
     }),
     $object({
       flag: $literal(false),
+      value: $optional($string),
     }),
   ]);
 
@@ -774,7 +776,5 @@ test("complex", () => {
   );
   expect(union.parse({ flag: false })).toStrictEqual(success({ flag: false }));
 
-  expect(union.parse({ flag: false, value: "test" })).toStrictEqual(
-    failure(error("malformed_value", ["flag"]), error("malformed_value")),
-  );
+  expect(union.parse({ flag: false, value: "test" })).toStrictEqual(success({ flag: false, value: "test" }));
 });
