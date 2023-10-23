@@ -86,31 +86,6 @@ type ValidateContext = Pick<ParseContext, "parent">;
  */
 type Validator<T> = (value: T, ctx: ValidateContext) => true | unknown;
 
-function undefinedParse(
-  input: unknown,
-  ctx: ParseContext | undefined,
-): Result<undefined> {
-  ctx = createParseContext(ctx);
-
-  if (isNullOrUndef(input)) {
-    return success(ctx, undefined);
-  } else {
-    return {
-      success: false,
-      errors: createError(ctx, "malformed_value"),
-    };
-  }
-}
-
-//
-// $undefined
-//
-
-export function $undefined(): Parser<undefined> {
-  return $undefined;
-}
-$undefined.parse = undefinedParse as ParseFunc<undefined>;
-
 //
 // $number
 //

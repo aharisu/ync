@@ -1,7 +1,6 @@
 import { expect, test } from "vitest";
 
 import {
-  $undefined,
   $number,
   $string,
   $boolean,
@@ -41,26 +40,6 @@ function error(
 function failure(error: any, ...errors: any[]) {
   return { success: false, errors: [error, ...errors] };
 }
-
-test("undefined", () => {
-  expect($undefined.parse(undefined)).toStrictEqual(success(undefined));
-  expect($undefined.parse(null)).toStrictEqual(success(undefined));
-  expect($undefined().parse(null)).toStrictEqual(success(undefined));
-
-  expect($undefined.parse("")).toStrictEqual(failure(error("malformed_value")));
-  expect($undefined.parse(0)).toStrictEqual(failure(error("malformed_value")));
-  expect($undefined.parse(false)).toStrictEqual(
-    failure(error("malformed_value")),
-  );
-  expect($undefined.parse([])).toStrictEqual(failure(error("malformed_value")));
-  expect($undefined.parse({})).toStrictEqual(failure(error("malformed_value")));
-  expect($undefined.parse(NaN)).toStrictEqual(
-    failure(error("malformed_value")),
-  );
-  expect($undefined.parse(" ")).toStrictEqual(
-    failure(error("malformed_value")),
-  );
-});
 
 test("number", () => {
   expect($number.parse(0)).toStrictEqual(success(0));
