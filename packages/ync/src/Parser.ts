@@ -802,31 +802,6 @@ export function $literal<T>(literal: Literal<T>): Parser<Literal<T>> {
 }
 
 //
-// $nullable
-//
-
-function parseNullable<T>(
-  inner: Parser<T>,
-  input: unknown,
-  ctx?: ParseContext,
-): Result<T | null | undefined> {
-  ctx = createParseContext(ctx);
-  if (typeof input === "undefined" || input === null) {
-    return success(ctx, input);
-  } else {
-    return (inner.parse as ParseFuncInternal)(input, ctx);
-  }
-}
-
-export function $nullable<T>(inner: Parser<T>): Parser<T | null | undefined> {
-  const parser = {
-    parse: (input: unknown, ctx?: ParseContext) =>
-      parseNullable(inner, input, ctx),
-  };
-  return parser;
-}
-
-//
 // $optional
 //
 

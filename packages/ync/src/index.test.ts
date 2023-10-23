@@ -7,7 +7,6 @@ import {
   $boolean,
   $object,
   $array,
-  $nullable,
   $intersection,
   $union,
   Infer,
@@ -721,16 +720,6 @@ test("literal", () => {
   expect($literal(true).parse("true")).toStrictEqual(success(true));
   //object literal not implemented
   //expect($literal({ a: "test" }).parse(true)).toStrictEqual(success({a: "test"));
-});
-
-test("nullable", () => {
-  expect($nullable($number).parse(undefined)).toStrictEqual(success(undefined));
-  expect($nullable($number).parse(null)).toStrictEqual(success(null));
-  expect($nullable($number).parse("123")).toStrictEqual(success(123));
-
-  expect($nullable($number).parse("123ABC")).toStrictEqual(
-    failure(error("malformed_value")),
-  );
 });
 
 test("nested_error", () => {
