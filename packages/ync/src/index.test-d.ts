@@ -5,10 +5,14 @@ test("number", () => {
   expectTypeOf($number()).toEqualTypeOf<Parser<number>>();
   expectTypeOf($number({ default: 0 })).toEqualTypeOf<Parser<number>>();
   expectTypeOf($number({ nullable: false })).toEqualTypeOf<Parser<number>>();
-  expectTypeOf($number({ default: 0, nullable: true })).toEqualTypeOf<
-    Parser<number | null>
-  >();
   expectTypeOf($number({ default: 0, nullable: false })).toEqualTypeOf<
+    Parser<number>
+  >();
+
+  expectTypeOf($number({ ifnull: 0, nullable: true })).toEqualTypeOf<
+    Parser<number>
+  >();
+  expectTypeOf($number({ ifnull: 0, nullable: false })).toEqualTypeOf<
     Parser<number>
   >();
 
@@ -19,16 +23,26 @@ test("number", () => {
   expectTypeOf($number({ nullable: true, default: undefined })).toEqualTypeOf<
     Parser<number | null>
   >();
+  expectTypeOf($number({ nullable: true, default: 0 })).toEqualTypeOf<
+    Parser<number | null>
+  >();
+  expectTypeOf($number({ nullable: true, ifnull: undefined })).toEqualTypeOf<
+    Parser<number | null>
+  >();
 });
 
 test("string", () => {
   expectTypeOf($string()).toEqualTypeOf<Parser<string>>();
   expectTypeOf($string({ default: "" })).toEqualTypeOf<Parser<string>>();
   expectTypeOf($string({ nullable: false })).toEqualTypeOf<Parser<string>>();
-  expectTypeOf($string({ default: "", nullable: true })).toEqualTypeOf<
-    Parser<string | null>
-  >();
   expectTypeOf($string({ default: "", nullable: false })).toEqualTypeOf<
+    Parser<string>
+  >();
+
+  expectTypeOf($string({ ifnull: "", nullable: true })).toEqualTypeOf<
+    Parser<string>
+  >();
+  expectTypeOf($string({ ifnull: "", nullable: false })).toEqualTypeOf<
     Parser<string>
   >();
 
@@ -39,16 +53,26 @@ test("string", () => {
   expectTypeOf($string({ nullable: true, default: undefined })).toEqualTypeOf<
     Parser<string | null>
   >();
+  expectTypeOf($string({ nullable: true, default: "" })).toEqualTypeOf<
+    Parser<string | null>
+  >();
+  expectTypeOf($string({ nullable: true, ifnull: undefined })).toEqualTypeOf<
+    Parser<string | null>
+  >();
 });
 
 test("boolean", () => {
   expectTypeOf($boolean()).toEqualTypeOf<Parser<boolean>>();
   expectTypeOf($boolean({ default: true })).toEqualTypeOf<Parser<boolean>>();
   expectTypeOf($boolean({ nullable: false })).toEqualTypeOf<Parser<boolean>>();
-  expectTypeOf($boolean({ default: true, nullable: true })).toEqualTypeOf<
-    Parser<boolean | null>
-  >();
   expectTypeOf($boolean({ default: true, nullable: false })).toEqualTypeOf<
+    Parser<boolean>
+  >();
+
+  expectTypeOf($boolean({ ifnull: true, nullable: true })).toEqualTypeOf<
+    Parser<boolean>
+  >();
+  expectTypeOf($boolean({ ifnull: true, nullable: false })).toEqualTypeOf<
     Parser<boolean>
   >();
 
@@ -57,6 +81,12 @@ test("boolean", () => {
     Parser<boolean | null>
   >();
   expectTypeOf($boolean({ nullable: true, default: undefined })).toEqualTypeOf<
+    Parser<boolean | null>
+  >();
+  expectTypeOf($boolean({ nullable: true, default: true,  })).toEqualTypeOf<
+    Parser<boolean | null>
+  >();
+  expectTypeOf($boolean({ nullable: true, ifnull: undefined,  })).toEqualTypeOf<
     Parser<boolean | null>
   >();
 });
@@ -70,10 +100,15 @@ test("object", () => {
     Parser<{ a: number }>
   >();
   expectTypeOf(
-    $object({ a: $number }, { default: { a: 0 }, nullable: true }),
-  ).toEqualTypeOf<Parser<{ a: number } | null>>();
-  expectTypeOf(
     $object({ a: $number }, { default: { a: 0 }, nullable: false }),
+  ).toEqualTypeOf<Parser<{ a: number }>>();
+
+  expectTypeOf(
+    $object({ a: $number }, { ifnull : { a: 0 }, nullable: true }),
+  ).toEqualTypeOf<Parser<{ a: number }>>();
+
+  expectTypeOf(
+    $object({ a: $number }, { ifnull : { a: 0 }, nullable: false }),
   ).toEqualTypeOf<Parser<{ a: number }>>();
 
   //nullable pattern
@@ -82,6 +117,12 @@ test("object", () => {
   >();
   expectTypeOf(
     $object({ a: $number }, { nullable: true, default: undefined }),
+  ).toEqualTypeOf<Parser<{ a: number } | null>>();
+  expectTypeOf(
+    $object({ a: $number }, { nullable: true, default: { a: 0 } }),
+  ).toEqualTypeOf<Parser<{ a: number } | null>>();
+  expectTypeOf(
+    $object({ a: $number }, { nullable: true, ifnull: undefined }),
   ).toEqualTypeOf<Parser<{ a: number } | null>>();
 });
 
@@ -94,10 +135,15 @@ test("array", () => {
     Parser<number[]>
   >();
   expectTypeOf(
-    $array($number, { default: [1, 2], nullable: true }),
-  ).toEqualTypeOf<Parser<number[] | null>>();
-  expectTypeOf(
     $array($number, { default: [1, 2], nullable: false }),
+  ).toEqualTypeOf<Parser<number[]>>();
+
+  expectTypeOf(
+    $array($number, { ifnull: [1, 2], nullable: true }),
+  ).toEqualTypeOf<Parser<number[]>>();
+
+  expectTypeOf(
+    $array($number, { ifnull: [1, 2], nullable: false }),
   ).toEqualTypeOf<Parser<number[]>>();
 
   //nullable pattern
@@ -106,6 +152,13 @@ test("array", () => {
   >();
   expectTypeOf(
     $array($number, { nullable: true, default: undefined }),
+  ).toEqualTypeOf<Parser<number[] | null>>();
+  expectTypeOf(
+    $array($number, { nullable: true, default: [1, 2] }),
+  ).toEqualTypeOf<Parser<number[] | null>>();
+
+  expectTypeOf(
+    $array($number, { nullable: true, ifnull: undefined }),
   ).toEqualTypeOf<Parser<number[] | null>>();
 });
 

@@ -18,6 +18,7 @@ type Result<T> =
     };
 
 type NullableOptions = {
+  ifnull?: never;
   nullable: true;
 };
 
@@ -91,6 +92,7 @@ type Validator<T> = (value: T, ctx: ValidateContext) => true | unknown;
 
 type NumberParserOptions = {
   default?: number;
+  ifnull?: number;
   nullable?: boolean;
   min?: number;
   max?: number;
@@ -125,7 +127,9 @@ function numberParse(
       };
     }
   } else if (input === null) {
-    if (options.nullable) {
+    if(!isUndefined(options.ifnull)) {
+      num = options.ifnull;
+    } else if (options.nullable) {
       return success(ctx, input);
     } else {
       return {
@@ -198,6 +202,7 @@ $number.parse = ((input: unknown, ctx?: ParseContext) =>
 
 type StringParserOptions = {
   default?: string;
+  ifnull?: string;
   nullable?: boolean;
   min?: number;
   max?: number;
@@ -223,7 +228,9 @@ function stringParse(
     }
 
   } else if (input === null) {
-    if (options.nullable) {
+    if(!isUndefined(options.ifnull)) {
+      str = options.ifnull;
+    } else if (options.nullable) {
       return success(ctx, input);
     } else {
       return {
@@ -292,6 +299,7 @@ $string.parse = ((input: unknown, ctx?: ParseContext) =>
 
 type BooleanParserOptions = {
   default?: boolean;
+  ifnull?: boolean;
   nullable?: boolean;
   validate?: Validator<boolean>;
 };
@@ -332,7 +340,9 @@ function booleanParse(
       };
     }
   } else if (input === null) {
-    if (options.nullable) {
+    if(!isUndefined(options.ifnull)) {
+      value = options.ifnull;
+    } else if (options.nullable) {
       return success(ctx, input);
     } else {
       return {
@@ -389,6 +399,7 @@ type ObjectMapInfer<Map extends Record<string, Parser<any>>> = Pretty<
 
 type ObjectParserOptions<Map extends Record<string, Parser<any>>> = {
   default?: ObjectMapInfer<Map>;
+  ifnull?: ObjectMapInfer<Map>;
   nullable?: boolean;
   exact?: boolean;
   validate?: Validator<ObjectMapInfer<Map>>;
@@ -402,23 +413,37 @@ function objectParse<Map extends Record<string, Parser<any>>>(
 ): MaybeNullableResult<ObjectMapInfer<Map>> {
   ctx = createParseContext(ctx);
 
+  const doValidate = (value: ObjectMapInfer<Map>) => {
+    if(options.validate !== undefined) {
+      const result = options.validate(value, ctx!);
+      if (result !== true) {
+        return {
+          success: false as const,
+          errors: createOptionalError(ctx!, "validate", result),
+        };
+      }
+    }
+    return true;
+  };
+
   if (isUndefined(input)) {
     if (options.default !== undefined) {
-      if (options.validate !== undefined) {
-        const result = options.validate(options.default, ctx);
-        if (result !== true) {
-          return {
-            success: false,
-            errors: createOptionalError(ctx, "validate", result),
-          };
-        }
+      const validationResult = doValidate(options.default);
+      if (validationResult !== true) {
+        return validationResult;
       }
       return success(ctx, options.default);
     } else {
       return { success: false, errors: createError(ctx, "required") };
     }
   } else if(input === null) {
-    if (options.nullable) {
+    if(!isUndefined(options.ifnull)) {
+      const validationResult = doValidate(options.ifnull);
+      if (validationResult !== true) {
+        return validationResult;
+      }
+      return success(ctx, options.ifnull);
+    } else if (options.nullable) {
       return success(ctx, input);
     } else {
       return { success: false, errors: createError(ctx, "malformed_value") };
@@ -461,13 +486,10 @@ function objectParse<Map extends Record<string, Parser<any>>>(
   }
   if ((options.exact ?? true) && unchecked.size > 0) {
     return { success: false, errors: createError(ctx, "malformed_value") };
-  } else if (options.validate !== undefined) {
-    const result = options.validate(parsedObj, ctx);
-    if (result !== true) {
-      return {
-        success: false,
-        errors: createOptionalError(ctx, "validate", result),
-      };
+  } else {
+    const validationResult = doValidate(parsedObj);
+    if (validationResult !== true) {
+      return validationResult;
     }
   }
 
@@ -501,6 +523,7 @@ export function $object<Map extends Record<string, Parser<any>>>(
 
 type ArrayParserOptions<T extends Parser<any>> = {
   default?: Array<Infer<T>>;
+  ifnull?: Array<Infer<T>>;
   nullable?: boolean;
   min?: number;
   max?: number;
@@ -515,17 +538,34 @@ function arrayParse<T extends Parser<any>>(
 ): NullableResult<Array<Infer<T>>> {
   ctx = createParseContext(ctx);
 
+  const doValidate = (value: Array<Infer<T>>) => {
+    if (options.min !== undefined && value.length < options.min) {
+      return {
+        success: false as const,
+        errors: createOptionalError(ctx!, "min", options.min),
+      };
+    } else if (options.max !== undefined && value.length > options.max) {
+      return {
+        success: false as const,
+        errors: createOptionalError(ctx!, "max", options.max),
+      };
+    } else if (options.validate !== undefined) {
+      const result = options.validate(value, ctx!);
+      if (result !== true) {
+        return {
+          success: false as const,
+          errors: createOptionalError(ctx!, "validate", result),
+        };
+      }
+    }
+    return true;
+  }
+
   if (isUndefined(input)) {
     if (options.default !== undefined) {
-      //TODO min max validate
-      if (options.validate !== undefined) {
-        const result = options.validate(options.default, ctx);
-        if (result !== true) {
-          return {
-            success: false,
-            errors: createOptionalError(ctx, "validate", result),
-          };
-        }
+      const validationResult = doValidate(options.default);
+      if (validationResult !== true) {
+        return validationResult;
       }
 
       return success(ctx, options.default);
@@ -533,7 +573,14 @@ function arrayParse<T extends Parser<any>>(
       return { success: false, errors: createError(ctx, "required") };
     }
   } else if(input === null) {
-    if (options.nullable) {
+    if(!isUndefined(options.ifnull)) {
+      const validationResult = doValidate(options.ifnull);
+      if (validationResult !== true) {
+        return validationResult;
+      }
+
+      return success(ctx, options.ifnull);
+    } else if (options.nullable) {
       return success(ctx, input);
     } else {
       return { success: false, errors: createError(ctx, "malformed_value") };
@@ -564,24 +611,9 @@ function arrayParse<T extends Parser<any>>(
     return { success: false, errors: ctx.errors };
   }
 
-  if (options.min !== undefined && parsed.length < options.min) {
-    return {
-      success: false,
-      errors: createOptionalError(ctx, "min", options.min),
-    };
-  } else if (options.max !== undefined && parsed.length > options.max) {
-    return {
-      success: false,
-      errors: createOptionalError(ctx, "max", options.max),
-    };
-  } else if (options.validate !== undefined) {
-    const result = options.validate(parsed, ctx);
-    if (result !== true) {
-      return {
-        success: false,
-        errors: createOptionalError(ctx, "validate", result),
-      };
-    }
+  const validationResult = doValidate(parsed);
+  if (validationResult !== true) {
+    return validationResult;
   }
 
   return success(ctx, parsed);

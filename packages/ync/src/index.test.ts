@@ -116,6 +116,13 @@ test("number with options", () => {
     success(null),
   );
 
+  expect($number({ ifnull: 10 }).parse(null)).toStrictEqual(
+    success(10),
+  );
+  expect($number({ ifnull: 10, nullable: true }).parse(null)).toStrictEqual(
+    success(10),
+  );
+
   expect($number({ nullable: true }).parse([])).toStrictEqual(
     failure(error("malformed_value")),
   );
@@ -230,6 +237,14 @@ test("string with options", () => {
     $string({ default: "hello", nullable: true }).parse(null),
   ).toStrictEqual(success(null));
 
+  expect(
+    $string({ ifnull: "hello" }).parse(null),
+  ).toStrictEqual(success("hello"));
+
+  expect(
+    $string({ ifnull: "hello", nullable: true }).parse(null),
+  ).toStrictEqual(success("hello"));
+
   expect($string({ nullable: true }).parse([])).toStrictEqual(
     failure(error("malformed_value")),
   );
@@ -294,6 +309,14 @@ test("boolean with options", () => {
   expect($boolean({ default: true, nullable: true }).parse(null)).toStrictEqual(
     success(null),
   );
+
+  expect(
+    $boolean({ ifnull: true }).parse(null),
+  ).toStrictEqual(success(true));
+
+  expect(
+    $boolean({ ifnull: true, nullable: true }).parse(null),
+  ).toStrictEqual(success(true));
 
   expect($boolean({ nullable: true }).parse([])).toStrictEqual(
     failure(error("malformed_value")),
@@ -448,6 +471,8 @@ test("object with options", () => {
   );
   expect($object({}, { nullable: true }).parse({})).toStrictEqual(success({}));
 
+  expect($object({}, { ifnull: {} }).parse(null)).toStrictEqual(success({}));
+
   expect($object({}, { nullable: true }).parse("other")).toStrictEqual(
     failure(error("malformed_value")),
   );
@@ -595,6 +620,10 @@ test("array with options", () => {
   ).toStrictEqual(success(["hello"]));
   expect($array($string, { default: ["hello"] }).parse(null)).toStrictEqual(
     failure(error("malformed_value")),
+  );
+
+  expect($array($string, { ifnull: ["hello"] }).parse(null)).toStrictEqual(
+    success(["hello"]),
   );
 
   expect($array($string, { nullable: true }).parse(undefined)).toStrictEqual(
