@@ -7,6 +7,8 @@ import {
   pushParent,
 } from "./ParseContext";
 
+import deepEqual from 'fast-deep-equal';
+
 type Result<T> =
   | {
       success: true;
@@ -801,7 +803,7 @@ function literalParse<T>(
     match = false;
   } else if (typeof literal === "object") {
     if (typeof input === "object") {
-      //TODO deep equal
+      match = deepEqual(literal, input);
     }
   } else if (typeof literal === "number") {
     if (typeof input === "string") {
