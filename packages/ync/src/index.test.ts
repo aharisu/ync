@@ -778,3 +778,13 @@ test("complex", () => {
 
   expect(union.parse({ flag: false, value: "test" })).toStrictEqual(success({ flag: false, value: "test" }));
 });
+
+test("optional", () => {
+  expect($optional($string).parse(undefined)).toStrictEqual(success(undefined));
+  expect($optional($string).parse(null)).toStrictEqual(failure(error("malformed_value")));
+
+  expect($optional($string({default: "hello"})).parse(undefined)).toStrictEqual(success("hello"));
+
+  expect($optional($string({ifnull: "hello"})).parse(null)).toStrictEqual(success("hello"));
+  expect($optional($string({nullable: true})).parse(null)).toStrictEqual(success(null));
+});

@@ -861,8 +861,13 @@ function parseOptional<T>(
 ): Result<T | undefined> {
   ctx = createParseContext(ctx);
   if (typeof input === "undefined") {
-    //TODO inner.parseがdefault値を持っている可能性があるため、呼び出しを行った上でエラーを返したなら、エラーを無視してsuccessを返す
-    return success(ctx, input);
+    //inner.parseがdefault値を持っている可能性があるため、呼び出しを行った上でエラーを返したなら、エラーを無視してsuccessを返す
+    const innerResult = (inner.parse as ParseFuncInternal)(input, ctx);
+    if (innerResult.success) {
+      return innerResult;
+    } else {
+      return success(ctx, input);
+    }
   } else {
     return (inner.parse as ParseFuncInternal)(input, ctx);
   }
