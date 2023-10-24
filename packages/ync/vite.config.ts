@@ -8,11 +8,16 @@ export default defineConfig({
   build: {
     lib: {
       entry: path.resolve(__dirname, "src", "index.ts"),
-      formats: ["es"],
+      formats: ["es", "cjs"],
       name: "ync",
       fileName: (ext) => `index.${ext}.js`,
     },
     target: "esnext",
     sourcemap: true,
+  },
+  test: {
+    cache: {
+      dir: "node_modules/.cache/vitest",
+    },
   },
 });
