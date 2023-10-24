@@ -18,7 +18,6 @@ type Result<T> =
     };
 
 type NullableOptions = {
-  default?: never;
   nullable: true;
 };
 
@@ -32,16 +31,16 @@ export interface Parser<T> {
   parse: ParseFunc<T>;
 }
 
-type NullableParser<T> = Parser<T | null | undefined>;
-type NullableResult<T> = Result<T | null | undefined>;
+type NullableParser<T> = Parser<T | null>;
+type NullableResult<T> = Result<T | null>;
 
 type MaybeNullableParser<T> = Parser<T> | NullableParser<T>;
 type MaybeNullableResult<T> = Result<T> | NullableResult<T>;
 
 export type Infer<T> = T extends Parser<infer U> ? U : unknown;
 
-function isNullOrUndef(input: unknown): input is null | undefined {
-  return typeof input === "undefined" || input === null;
+function isUndefined(input: unknown): input is undefined {
+  return typeof input === "undefined";
 }
 
 function createError(
@@ -116,15 +115,22 @@ function numberParse(
     }
 
     num = input;
-  } else if (isNullOrUndef(input)) {
+  } else if (isUndefined(input)) {
     if (options.default !== undefined) {
       num = options.default;
-    } else if (options.nullable) {
-      return success(ctx, input);
     } else {
       return {
         success: false,
         errors: createError(ctx, "required"),
+      };
+    }
+  } else if (input === null) {
+    if (options.nullable) {
+      return success(ctx, input);
+    } else {
+      return {
+        success: false,
+        errors: createError(ctx, "malformed_value"),
       };
     }
   } else if (typeof input === "string") {
@@ -209,13 +215,21 @@ function stringParse(
   let str;
   if (typeof input === "string") {
     str = input;
-  } else if (isNullOrUndef(input)) {
+  } else if (isUndefined(input)) {
     if (options.default !== undefined) {
       return success(ctx, options.default);
-    } else if (options.nullable) {
-      return success(ctx, input);
     } else {
       return { success: false, errors: createError(ctx, "required") };
+    }
+
+  } else if (input === null) {
+    if (options.nullable) {
+      return success(ctx, input);
+    } else {
+      return {
+        success: false,
+        errors: createError(ctx, "malformed_value"),
+      }; //illegal input
     }
   } else if (typeof input === "object") {
     return {
@@ -307,13 +321,24 @@ function booleanParse(
     if (result !== null) {
       value = result;
     }
-  } else if (isNullOrUndef(input)) {
+
+  } else if (isUndefined(input)) {
     if (options.default !== undefined) {
       value = options.default;
-    } else if (options.nullable) {
+    } else {
+      return {
+        success: false,
+        errors: createError(ctx, "required"),
+      };
+    }
+  } else if (input === null) {
+    if (options.nullable) {
       return success(ctx, input);
     } else {
-      return { success: false, errors: createError(ctx, "required") };
+      return {
+        success: false,
+        errors: createError(ctx, "malformed_value"),
+      };
     }
   }
 
@@ -377,7 +402,7 @@ function objectParse<Map extends Record<string, Parser<any>>>(
 ): MaybeNullableResult<ObjectMapInfer<Map>> {
   ctx = createParseContext(ctx);
 
-  if (isNullOrUndef(input)) {
+  if (isUndefined(input)) {
     if (options.default !== undefined) {
       if (options.validate !== undefined) {
         const result = options.validate(options.default, ctx);
@@ -389,10 +414,14 @@ function objectParse<Map extends Record<string, Parser<any>>>(
         }
       }
       return success(ctx, options.default);
-    } else if (options.nullable) {
-      return success(ctx, input);
     } else {
       return { success: false, errors: createError(ctx, "required") };
+    }
+  } else if(input === null) {
+    if (options.nullable) {
+      return success(ctx, input);
+    } else {
+      return { success: false, errors: createError(ctx, "malformed_value") };
     }
   }
 
@@ -486,8 +515,9 @@ function arrayParse<T extends Parser<any>>(
 ): NullableResult<Array<Infer<T>>> {
   ctx = createParseContext(ctx);
 
-  if (isNullOrUndef(input)) {
+  if (isUndefined(input)) {
     if (options.default !== undefined) {
+      //TODO min max validate
       if (options.validate !== undefined) {
         const result = options.validate(options.default, ctx);
         if (result !== true) {
@@ -499,10 +529,14 @@ function arrayParse<T extends Parser<any>>(
       }
 
       return success(ctx, options.default);
-    } else if (options.nullable) {
-      return success(ctx, input);
     } else {
       return { success: false, errors: createError(ctx, "required") };
+    }
+  } else if(input === null) {
+    if (options.nullable) {
+      return success(ctx, input);
+    } else {
+      return { success: false, errors: createError(ctx, "malformed_value") };
     }
   }
 
@@ -795,6 +829,7 @@ function parseOptional<T>(
 ): Result<T | undefined> {
   ctx = createParseContext(ctx);
   if (typeof input === "undefined") {
+    //TODO inner.parseがdefault値を持っている可能性があるため、呼び出しを行った上でエラーを返したなら、エラーを無視してsuccessを返す
     return success(ctx, input);
   } else {
     return (inner.parse as ParseFuncInternal)(input, ctx);

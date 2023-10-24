@@ -69,7 +69,7 @@ test("number", () => {
     failure(error("malformed_value")),
   );
   expect($number.parse(undefined)).toStrictEqual(failure(error("required")));
-  expect($number.parse(null)).toStrictEqual(failure(error("required")));
+  expect($number.parse(null)).toStrictEqual(failure(error("malformed_value")));
   expect($number.parse(true)).toStrictEqual(failure(error("malformed_value")));
   expect($number.parse(false)).toStrictEqual(failure(error("malformed_value")));
   expect($number.parse([])).toStrictEqual(failure(error("malformed_value")));
@@ -105,7 +105,7 @@ test("number with options", () => {
   expect($number({ default: 10 }).parse(undefined)).toStrictEqual(success(10));
 
   expect($number({ nullable: true }).parse(undefined)).toStrictEqual(
-    success(undefined),
+    failure(error("required"))
   );
   expect($number({ nullable: true }).parse(null)).toStrictEqual(success(null));
   expect($number({ nullable: true }).parse(10)).toStrictEqual(success(10));
@@ -113,7 +113,7 @@ test("number with options", () => {
     $number({ default: 10, nullable: true }).parse(undefined),
   ).toStrictEqual(success(10));
   expect($number({ default: 10, nullable: true }).parse(null)).toStrictEqual(
-    success(10),
+    success(null),
   );
 
   expect($number({ nullable: true }).parse([])).toStrictEqual(
@@ -152,7 +152,7 @@ test("string", () => {
   expect($string.parse(NaN)).toStrictEqual(success("NaN"));
 
   expect($string.parse(undefined)).toStrictEqual(failure(error("required")));
-  expect($string.parse(null)).toStrictEqual(failure(error("required")));
+  expect($string.parse(null)).toStrictEqual(failure(error("malformed_value")));
   expect($string.parse([])).toStrictEqual(failure(error("malformed_value")));
   expect($string.parse({})).toStrictEqual(failure(error("malformed_value")));
 });
@@ -205,7 +205,7 @@ test("string with options", () => {
     success("hello"),
   );
   expect($string({ default: "hello" }).parse(null)).toStrictEqual(
-    success("hello"),
+    failure(error("malformed_value")),
   );
 
   // If a valid value is specified and it fails to parse, the default value will be ignored.
@@ -217,7 +217,7 @@ test("string with options", () => {
   );
 
   expect($string({ nullable: true }).parse(undefined)).toStrictEqual(
-    success(undefined),
+    failure(error("required")),
   );
   expect($string({ nullable: true }).parse(null)).toStrictEqual(success(null));
   expect($string({ nullable: true }).parse("hello")).toStrictEqual(
@@ -228,7 +228,7 @@ test("string with options", () => {
   ).toStrictEqual(success("hello"));
   expect(
     $string({ default: "hello", nullable: true }).parse(null),
-  ).toStrictEqual(success("hello"));
+  ).toStrictEqual(success(null));
 
   expect($string({ nullable: true }).parse([])).toStrictEqual(
     failure(error("malformed_value")),
@@ -270,7 +270,7 @@ test("boolean", () => {
   expect($boolean.parse("1")).toStrictEqual(failure(error("malformed_value")));
   expect($boolean.parse("0")).toStrictEqual(failure(error("malformed_value")));
   expect($boolean.parse(undefined)).toStrictEqual(failure(error("required")));
-  expect($boolean.parse(null)).toStrictEqual(failure(error("required")));
+  expect($boolean.parse(null)).toStrictEqual(failure(error("malformed_value")));
   expect($boolean.parse([])).toStrictEqual(failure(error("malformed_value")));
   expect($boolean.parse({})).toStrictEqual(failure(error("malformed_value")));
 });
@@ -284,7 +284,7 @@ test("boolean with options", () => {
   );
 
   expect($boolean({ nullable: true }).parse(undefined)).toStrictEqual(
-    success(undefined),
+    failure(error("required")),
   );
   expect($boolean({ nullable: true }).parse(null)).toStrictEqual(success(null));
   expect($boolean({ nullable: true }).parse(true)).toStrictEqual(success(true));
@@ -292,7 +292,7 @@ test("boolean with options", () => {
     $boolean({ default: true, nullable: true }).parse(undefined),
   ).toStrictEqual(success(true));
   expect($boolean({ default: true, nullable: true }).parse(null)).toStrictEqual(
-    success(true),
+    success(null),
   );
 
   expect($boolean({ nullable: true }).parse([])).toStrictEqual(
@@ -439,9 +439,9 @@ test("object with options", () => {
   expect($object({}, { default: {} }).parse(undefined)).toStrictEqual(
     success({}),
   );
-  expect($object({}, { default: {} }).parse(null)).toStrictEqual(success({}));
+  expect($object({}, { default: {} }).parse(null)).toStrictEqual(failure(error("malformed_value")));
   expect($object({}, { nullable: true }).parse(undefined)).toStrictEqual(
-    success(undefined),
+    failure(error("required")),
   );
   expect($object({}, { nullable: true }).parse(null)).toStrictEqual(
     success(null),
@@ -563,7 +563,7 @@ test("array", () => {
   expect($array($string).parse(undefined)).toStrictEqual(
     failure(error("required")),
   );
-  expect($array($string).parse(null)).toStrictEqual(failure(error("required")));
+  expect($array($string).parse(null)).toStrictEqual(failure(error("malformed_value")));
   expect($array($string).parse("other")).toStrictEqual(
     failure(error("malformed_value")),
   );
@@ -594,11 +594,11 @@ test("array with options", () => {
     $array($string, { default: ["hello"] }).parse(undefined),
   ).toStrictEqual(success(["hello"]));
   expect($array($string, { default: ["hello"] }).parse(null)).toStrictEqual(
-    success(["hello"]),
+    failure(error("malformed_value")),
   );
 
   expect($array($string, { nullable: true }).parse(undefined)).toStrictEqual(
-    success(undefined),
+    failure(error("required")),
   );
   expect($array($string, { nullable: true }).parse(null)).toStrictEqual(
     success(null),
@@ -611,7 +611,7 @@ test("array with options", () => {
   ).toStrictEqual(success(["hello"]));
   expect(
     $array($string, { default: ["hello"], nullable: true }).parse(null),
-  ).toStrictEqual(success(["hello"]));
+  ).toStrictEqual(success(null));
 
   expect($array($string, { nullable: true }).parse("other")).toStrictEqual(
     failure(error("malformed_value")),
@@ -647,8 +647,11 @@ test("union", () => {
     $union([$boolean({ nullable: true }), $number]).parse(null),
   ).toStrictEqual(success(null));
 
-  expect($union([$boolean, $number]).parse(null)).toStrictEqual(
+  expect($union([$boolean, $number]).parse(undefined)).toStrictEqual(
     failure(error("required"), error("required")),
+  );
+  expect($union([$boolean, $number]).parse(null)).toStrictEqual(
+    failure(error("malformed_value"), error("malformed_value")),
   );
   expect($union([$boolean, $number]).parse("hello")).toStrictEqual(
     failure(error("malformed_value"), error("malformed_value")),
