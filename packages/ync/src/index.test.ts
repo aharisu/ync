@@ -762,12 +762,16 @@ test("literal", () => {
   expect($literal(1).parse(1)).toStrictEqual(success(1));
   expect($literal(NaN).parse(NaN)).toStrictEqual(success(NaN));
   expect($literal("test").parse("test")).toStrictEqual(success("test"));
+  expect($literal("16").parse(0x10)).toStrictEqual(success("16"));
   expect($literal(1).parse("1")).toStrictEqual(success(1));
   expect($literal(true).parse("true")).toStrictEqual(success(true));
   expect($literal({ a: "test", b: 1, c: true }).parse({c: true, b: 1, a: "test"})).toStrictEqual(success({a: "test", c: true, b: 1}));
   expect($literal([1, 2, 3, "da-"]).parse([1, 2, 3, "da-"])).toStrictEqual(success([1, 2, 3, "da-"]));
   expect($literal([1, 2, 3]).parse([3, 2, 1])).toStrictEqual(failure(error("malformed_value")));
   expect($literal([1, 2, 3]).parse({0: 1, 1: 2, 2: 3})).toStrictEqual(failure(error("malformed_value")));
+  expect($literal(1).parse(null)).toStrictEqual(failure(error("malformed_value")));
+  expect($literal(1).parse(undefined)).toStrictEqual(failure(error("malformed_value")));
+
 });
 
 test("nested_error", () => {
