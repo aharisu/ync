@@ -1,27 +1,54 @@
 {
-  "license": "MIT",
-  "author": "aharisu",
-  "workspaces": [
-    "packages/*"
+  "name": "@aharisu/ync",
+  "version": "0.0.2",
+  "description": "Ync is a validator and parser inspired by lizod, which in turn was inspired by zod.",
+  "keywords": [
+    "typescript",
+    "schema",
+    "validation",
+    "type",
+    "zod"
   ],
-  "scripts": {},
+  "bugs": {
+    "url": "https://github.com/aharisu/ync/issues"
+  },
+  "type": "module",
+  "module": "dist/index.es.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.es.js"
+      },
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs.js"
+    }
+  },
+  "sideEffects": false,
+  "files": [
+    "dist"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aharisu/ync.git"
+  },
+  "author": "aharisu",
+  "license": "MIT",
+  "scripts": {
+    "test": "vitest",
+    "typecheck": "vitest typecheck",
+    "coverage": "vitest run --coverage",
+    "build": "vite build && tsc --emitDeclarationOnly"
+  },
   "devDependencies": {
-    "@trivago/prettier-plugin-sort-imports": "^4.2.0",
-    "@typescript-eslint/eslint-plugin": "^6.8.0",
-    "@typescript-eslint/parser": "^6.8.0",
+    "@vitest/coverage-istanbul": "^0.34.6",
     "@vitest/ui": "^0.34.6",
-    "eslint": "^8.51.0",
-    "eslint-config-prettier": "^9.0.0",
-    "eslint-import-resolver-typescript": "^3.6.1",
-    "eslint-plugin-import": "^2.28.1",
-    "eslint-plugin-jsx-a11y": "^6.7.1",
-    "prettier": "^3.0.3",
     "typescript": "^5.2.2",
     "vite": "^4.4.11",
     "vitest": "^0.34.6"
   },
-  "engines": {
-    "node": ">=14",
-    "pnpm": ">=8"
+  "dependencies": {
+    "fast-deep-equal": "^3.1.3"
   }
 }
