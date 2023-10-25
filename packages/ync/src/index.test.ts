@@ -476,6 +476,27 @@ test("object with options", () => {
   expect($object({}, { nullable: true }).parse("other")).toStrictEqual(
     failure(error("malformed_value")),
   );
+
+  class ObjectTest
+  {
+    a: string;
+    b: number;
+
+    constructor(a: string, b: number) {
+      this.a = a;
+      this.b = b;
+    }
+  }
+
+  expect($object({
+    obj: $object({
+      a: $string,
+      b: $number,
+    }),
+  }).parse({obj: new ObjectTest("hello", 123)})
+  ).toStrictEqual(success({obj: {a: "hello", b: 123}}));
+
+
 });
 
 test("object with validate", () => {
@@ -716,6 +737,20 @@ test("intersection", () => {
       $union([$boolean, $number]),
     ]).parse(1),
   ).toStrictEqual(success(1));
+
+  expect(
+    $intersection([
+      $number({nullable: true}),
+      $boolean({nullable: true}),
+    ]).parse(null)
+  ).toStrictEqual(success(null));
+
+  expect(
+    $intersection([
+      $array($string),
+      $array($number),
+    ]).parse(["1", "2"])
+  ).toStrictEqual(success([1, 2]));
 });
 
 test("literal", () => {
