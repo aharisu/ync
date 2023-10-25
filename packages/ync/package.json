@@ -27,9 +27,11 @@
   "scripts": {
     "test": "vitest",
     "typecheck": "vitest typecheck",
+    "coverage": "vitest run --coverage",
     "build": "vite build && tsc --emitDeclarationOnly"
   },
   "devDependencies": {
+    "@vitest/coverage-istanbul": "^0.34.6",
     "typescript": "^5.2.2",
     "vite": "^4.4.11",
     "vitest": "^0.34.6"

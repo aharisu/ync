@@ -19,5 +19,9 @@ export default defineConfig({
     cache: {
       dir: "node_modules/.cache/vitest",
     },
+    coverage: {
+      provider: 'istanbul', // or 'v8'
+      reporter: ['text', 'json', 'html'],
+    },
   },
 });
