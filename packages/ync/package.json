@@ -1,6 +1,17 @@
 {
   "name": "@aharisu/ync",
-  "version": "0.0.0",
+  "version": "0.0.1",
+  "description": "Ync is a validator and parser inspired by lizod, which in turn was inspired by zod.",
+  "keywords": [
+    "typescript",
+    "schema",
+    "validation",
+    "type",
+    "zod"
+  ],
+  "bugs": {
+    "url": "https://github.com/aharisu/ync/issues"
+  },
   "type": "module",
   "module": "dist/index.es.js",
   "types": "dist/index.d.ts",
