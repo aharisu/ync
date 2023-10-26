@@ -13,16 +13,17 @@
     "url": "https://github.com/aharisu/ync/issues"
   },
   "type": "module",
-  "module": "dist/index.es.js",
+  "main": "dist/cjs/index.cjs",
+  "module": "dist/es/index.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
       "import": {
         "types": "./dist/index.d.ts",
-        "default": "./dist/index.es.js"
+        "default": "./dist/es/index.js"
       },
       "types": "./dist/index.d.ts",
-      "require": "./dist/index.cjs.js"
+      "require": "./dist/cjs/index.cjs"
     }
   },
   "sideEffects": false,

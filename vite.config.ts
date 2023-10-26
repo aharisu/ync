@@ -10,10 +10,17 @@ export default defineConfig({
       entry: path.resolve(__dirname, "src", "index.ts"),
       formats: ["es", "cjs"],
       name: "ync",
-      fileName: (ext) => `index.${ext}.js`,
+      fileName: '[format]/[name]',
     },
     target: "esnext",
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        preserveModules: true,
+        preserveModulesRoot: "src",
+        exports: "named",
+      },
+    }
   },
   test: {
     cache: {
