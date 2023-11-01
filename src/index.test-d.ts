@@ -1,4 +1,14 @@
-import { $array, $boolean, $literal, $number, $object, $optional, $string, $union, Parser } from "src";
+import {
+  $array,
+  $boolean,
+  $literal,
+  $number,
+  $object,
+  $optional,
+  $string,
+  $union,
+  Parser,
+} from "./index";
 import { expectTypeOf, test } from "vitest";
 
 test("number", () => {
@@ -83,10 +93,10 @@ test("boolean", () => {
   expectTypeOf($boolean({ nullable: true, default: undefined })).toEqualTypeOf<
     Parser<boolean | null>
   >();
-  expectTypeOf($boolean({ nullable: true, default: true,  })).toEqualTypeOf<
+  expectTypeOf($boolean({ nullable: true, default: true })).toEqualTypeOf<
     Parser<boolean | null>
   >();
-  expectTypeOf($boolean({ nullable: true, ifnull: undefined,  })).toEqualTypeOf<
+  expectTypeOf($boolean({ nullable: true, ifnull: undefined })).toEqualTypeOf<
     Parser<boolean | null>
   >();
 });
@@ -100,15 +110,15 @@ test("object", () => {
     Parser<{ a: number }>
   >();
   expectTypeOf(
-    $object({ a: $number }, { default: { a: 0 }, nullable: false }),
+    $object({ a: $number }, { default: { a: 0 }, nullable: false })
   ).toEqualTypeOf<Parser<{ a: number }>>();
 
   expectTypeOf(
-    $object({ a: $number }, { ifnull : { a: 0 }, nullable: true }),
+    $object({ a: $number }, { ifnull: { a: 0 }, nullable: true })
   ).toEqualTypeOf<Parser<{ a: number }>>();
 
   expectTypeOf(
-    $object({ a: $number }, { ifnull : { a: 0 }, nullable: false }),
+    $object({ a: $number }, { ifnull: { a: 0 }, nullable: false })
   ).toEqualTypeOf<Parser<{ a: number }>>();
 
   //nullable pattern
@@ -116,13 +126,13 @@ test("object", () => {
     Parser<{ a: number } | null>
   >();
   expectTypeOf(
-    $object({ a: $number }, { nullable: true, default: undefined }),
+    $object({ a: $number }, { nullable: true, default: undefined })
   ).toEqualTypeOf<Parser<{ a: number } | null>>();
   expectTypeOf(
-    $object({ a: $number }, { nullable: true, default: { a: 0 } }),
+    $object({ a: $number }, { nullable: true, default: { a: 0 } })
   ).toEqualTypeOf<Parser<{ a: number } | null>>();
   expectTypeOf(
-    $object({ a: $number }, { nullable: true, ifnull: undefined }),
+    $object({ a: $number }, { nullable: true, ifnull: undefined })
   ).toEqualTypeOf<Parser<{ a: number } | null>>();
 });
 
@@ -135,15 +145,15 @@ test("array", () => {
     Parser<number[]>
   >();
   expectTypeOf(
-    $array($number, { default: [1, 2], nullable: false }),
+    $array($number, { default: [1, 2], nullable: false })
   ).toEqualTypeOf<Parser<number[]>>();
 
   expectTypeOf(
-    $array($number, { ifnull: [1, 2], nullable: true }),
+    $array($number, { ifnull: [1, 2], nullable: true })
   ).toEqualTypeOf<Parser<number[]>>();
 
   expectTypeOf(
-    $array($number, { ifnull: [1, 2], nullable: false }),
+    $array($number, { ifnull: [1, 2], nullable: false })
   ).toEqualTypeOf<Parser<number[]>>();
 
   //nullable pattern
@@ -151,14 +161,14 @@ test("array", () => {
     Parser<number[] | null>
   >();
   expectTypeOf(
-    $array($number, { nullable: true, default: undefined }),
+    $array($number, { nullable: true, default: undefined })
   ).toEqualTypeOf<Parser<number[] | null>>();
   expectTypeOf(
-    $array($number, { nullable: true, default: [1, 2] }),
+    $array($number, { nullable: true, default: [1, 2] })
   ).toEqualTypeOf<Parser<number[] | null>>();
 
   expectTypeOf(
-    $array($number, { nullable: true, ifnull: undefined }),
+    $array($number, { nullable: true, ifnull: undefined })
   ).toEqualTypeOf<Parser<number[] | null>>();
 });
 
@@ -168,11 +178,11 @@ test("literal", () => {
   expectTypeOf($literal(1)).toEqualTypeOf<Parser<1>>();
   expectTypeOf($literal(3.14)).toEqualTypeOf<Parser<3.14>>();
   expectTypeOf(
-    $literal({ a: "hello", b: "world", c: { d: "!!" } }),
+    $literal({ a: "hello", b: "world", c: { d: "!!" } })
   ).toEqualTypeOf<Parser<{ a: "hello"; b: "world"; c: { d: "!!" } }>>();
 
   expectTypeOf(
-    $literal([1, "2", 3.14, true, { a: "hello", b: ["world"] }]),
+    $literal([1, "2", 3.14, true, { a: "hello", b: ["world"] }])
   ).toEqualTypeOf<Parser<[1, "2", 3.14, true, { a: "hello"; b: ["world"] }]>>();
 
   //NaN is not literal
@@ -190,6 +200,8 @@ test("complex", () => {
         flag: $literal(false),
         value: $optional($string),
       }),
-    ]),
-  ).toEqualTypeOf<Parser<{ flag: true; value: string } | { flag: false, value?: string }>>();
+    ])
+  ).toEqualTypeOf<
+    Parser<{ flag: true; value: string } | { flag: false; value?: string }>
+  >();
 });

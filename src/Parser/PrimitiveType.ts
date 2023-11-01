@@ -1,92 +1,24 @@
+import deepEqual from "fast-deep-equal";
+
 import {
+  MaybeNullableParser,
+  MaybeNullableResult,
+  NullableOptions,
+  NullableParser,
+  NullableResult,
   ParseContext,
-  ParseError,
+  ParseFuncInternal,
+  createError,
+  createOptionalError,
   createParseContext,
-  getPath,
+  isUndefined,
   popParent,
   pushParent,
-} from "./ParseContext";
+  stringToBoolean,
+  success,
+} from "./common";
 
-import deepEqual from 'fast-deep-equal';
-
-type Result<T> =
-  | {
-      success: true;
-      value: T;
-    }
-  | {
-      success: false;
-      errors: Array<ParseError>;
-    };
-
-type NullableOptions = {
-  ifnull?: never;
-  nullable: true;
-};
-
-type ParseFunc<T> = (input: unknown) => Result<T>;
-type ParseFuncInternal<T = any> = (
-  input: unknown,
-  ctx: ParseContext | undefined,
-) => Result<T>;
-
-export interface Parser<T> {
-  parse: ParseFunc<T>;
-}
-
-type NullableParser<T> = Parser<T | null>;
-type NullableResult<T> = Result<T | null>;
-
-type MaybeNullableParser<T> = Parser<T> | NullableParser<T>;
-type MaybeNullableResult<T> = Result<T> | NullableResult<T>;
-
-export type Infer<T> = T extends Parser<infer U> ? U : unknown;
-
-function isUndefined(input: unknown): input is undefined {
-  return typeof input === "undefined";
-}
-
-function createError(
-  ctx: ParseContext,
-  kind: Exclude<ParseError["kind"], "optional_validation_failure">,
-): Array<ParseError> {
-  ctx.errors.push({
-    path: getPath(ctx),
-    kind: kind,
-  });
-
-  return ctx.errors;
-}
-
-function createOptionalError(
-  ctx: ParseContext,
-  option: string,
-  optionValue: any,
-): Array<ParseError> {
-  ctx.errors.push({
-    path: getPath(ctx),
-    kind: "optional_validation_failure",
-    option: option,
-    optionValue: optionValue,
-  });
-
-  return ctx.errors;
-}
-
-function success<T>(ctx: ParseContext, value: T): Result<T> {
-  return {
-    success: true,
-    value: value,
-  };
-}
-
-type ValidateContext = Pick<ParseContext, "parent">;
-
-/**
- * Validation is considered successful only when the return value is true.
- * Any other return value will result in an error.
- */
-type Validator<T> = (value: T, ctx: ValidateContext) => true | unknown;
+import { Infer, ParseFunc, Parser, Result, Validator } from "./type";
 
 //
 // $number
@@ -105,7 +37,7 @@ type NumberParserOptions = {
 function numberParse(
   options: NumberParserOptions,
   input: unknown,
-  ctx: ParseContext | undefined,
+  ctx: ParseContext | undefined
 ): MaybeNullableResult<number> {
   ctx = createParseContext(ctx);
 
@@ -129,7 +61,7 @@ function numberParse(
       };
     }
   } else if (input === null) {
-    if(!isUndefined(options.ifnull)) {
+    if (!isUndefined(options.ifnull)) {
       num = options.ifnull;
     } else if (options.nullable) {
       return success(ctx, input);
@@ -181,13 +113,13 @@ function numberParse(
 }
 
 export function $number(
-  options: NullableOptions & NumberParserOptions,
+  options: NullableOptions & NumberParserOptions
 ): NullableParser<number>;
 
 export function $number(options?: NumberParserOptions): Parser<number>;
 
 export function $number(
-  options?: NumberParserOptions,
+  options?: NumberParserOptions
 ): MaybeNullableParser<number> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
@@ -215,7 +147,7 @@ type StringParserOptions = {
 function stringParse(
   options: StringParserOptions,
   input: unknown,
-  ctx: ParseContext | undefined,
+  ctx: ParseContext | undefined
 ): MaybeNullableResult<string> {
   ctx = createParseContext(ctx);
 
@@ -228,9 +160,8 @@ function stringParse(
     } else {
       return { success: false, errors: createError(ctx, "required") };
     }
-
   } else if (input === null) {
-    if(!isUndefined(options.ifnull)) {
+    if (!isUndefined(options.ifnull)) {
       str = options.ifnull;
     } else if (options.nullable) {
       return success(ctx, input);
@@ -278,13 +209,13 @@ function stringParse(
 }
 
 export function $string(
-  options: NullableOptions & StringParserOptions,
+  options: NullableOptions & StringParserOptions
 ): NullableParser<string>;
 
 export function $string(options?: StringParserOptions): Parser<string>;
 
 export function $string(
-  options?: StringParserOptions,
+  options?: StringParserOptions
 ): MaybeNullableParser<string> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
@@ -306,20 +237,10 @@ type BooleanParserOptions = {
   validate?: Validator<boolean>;
 };
 
-function stringToBoolean(str: string): boolean | null {
-  if (str.toLocaleLowerCase() === "true") {
-    return true;
-  } else if (str.toLocaleLowerCase() === "false") {
-    return false;
-  } else {
-    return null;
-  }
-}
-
 function booleanParse(
   options: BooleanParserOptions,
   input: unknown,
-  ctx: ParseContext | undefined,
+  ctx: ParseContext | undefined
 ): MaybeNullableResult<boolean> {
   ctx = createParseContext(ctx);
 
@@ -331,7 +252,6 @@ function booleanParse(
     if (result !== null) {
       value = result;
     }
-
   } else if (isUndefined(input)) {
     if (options.default !== undefined) {
       value = options.default;
@@ -342,7 +262,7 @@ function booleanParse(
       };
     }
   } else if (input === null) {
-    if(!isUndefined(options.ifnull)) {
+    if (!isUndefined(options.ifnull)) {
       value = options.ifnull;
     } else if (options.nullable) {
       return success(ctx, input);
@@ -370,13 +290,13 @@ function booleanParse(
 }
 
 export function $boolean(
-  options: NullableOptions & BooleanParserOptions,
+  options: NullableOptions & BooleanParserOptions
 ): NullableParser<boolean>;
 
 export function $boolean(options?: BooleanParserOptions): Parser<boolean>;
 
 export function $boolean(
-  options?: BooleanParserOptions,
+  options?: BooleanParserOptions
 ): MaybeNullableParser<boolean> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
@@ -395,8 +315,15 @@ $boolean.parse = ((input: unknown, ctx?: ParseContext) =>
 type Pretty<T> = { [K in keyof T]: T[K] } & {};
 
 type ObjectMapInfer<Map extends Record<string, Parser<any>>> = Pretty<
-  { [K in keyof Map as Map[K] extends OptionalParser<any> ? never : K]: Infer<Map[K]> } &
-  { [K in keyof Map as Map[K] extends OptionalParser<any> ? K : never]?: Infer<Map[K]> }
+  {
+    [K in keyof Map as Map[K] extends OptionalParser<any> ? never : K]: Infer<
+      Map[K]
+    >;
+  } & {
+    [K in keyof Map as Map[K] extends OptionalParser<any> ? K : never]?: Infer<
+      Map[K]
+    >;
+  }
 >;
 
 type ObjectParserOptions<Map extends Record<string, Parser<any>>> = {
@@ -411,12 +338,12 @@ function objectParse<Map extends Record<string, Parser<any>>>(
   map: Map,
   options: ObjectParserOptions<Map>,
   input: unknown,
-  ctx: ParseContext | undefined,
+  ctx: ParseContext | undefined
 ): MaybeNullableResult<ObjectMapInfer<Map>> {
   ctx = createParseContext(ctx);
 
   const doValidate = (value: ObjectMapInfer<Map>) => {
-    if(options.validate !== undefined) {
+    if (options.validate !== undefined) {
       const result = options.validate(value, ctx!);
       if (result !== true) {
         return {
@@ -438,8 +365,8 @@ function objectParse<Map extends Record<string, Parser<any>>>(
     } else {
       return { success: false, errors: createError(ctx, "required") };
     }
-  } else if(input === null) {
-    if(!isUndefined(options.ifnull)) {
+  } else if (input === null) {
+    if (!isUndefined(options.ifnull)) {
       const validationResult = doValidate(options.ifnull);
       if (validationResult !== true) {
         return validationResult;
@@ -467,7 +394,10 @@ function objectParse<Map extends Record<string, Parser<any>>>(
       continue;
     }
 
-    if(isOptionalParser(parser) && (key in (input as Record<string, any>)) === false) {
+    if (
+      isOptionalParser(parser) &&
+      key in (input as Record<string, any>) === false
+    ) {
       //optionalなプロパティに対して、対応する入力フィールドが存在しなくてもOKなのでここでは何もしない
     } else {
       const item = (input as Record<string, any>)[key];
@@ -500,17 +430,17 @@ function objectParse<Map extends Record<string, Parser<any>>>(
 
 export function $object<Map extends Record<string, Parser<any>>>(
   map: Map,
-  options: NullableOptions & ObjectParserOptions<Map>,
+  options: NullableOptions & ObjectParserOptions<Map>
 ): NullableParser<ObjectMapInfer<Map>>;
 
 export function $object<Map extends Record<string, Parser<any>>>(
   map: Map,
-  options?: ObjectParserOptions<Map>,
+  options?: ObjectParserOptions<Map>
 ): Parser<ObjectMapInfer<Map>>;
 
 export function $object<Map extends Record<string, Parser<any>>>(
   map: Map,
-  options?: ObjectParserOptions<Map>,
+  options?: ObjectParserOptions<Map>
 ): MaybeNullableParser<ObjectMapInfer<Map>> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
@@ -536,7 +466,7 @@ function arrayParse<T extends Parser<any>>(
   item: T,
   options: ArrayParserOptions<T>,
   input: unknown,
-  ctx: ParseContext | undefined,
+  ctx: ParseContext | undefined
 ): NullableResult<Array<Infer<T>>> {
   ctx = createParseContext(ctx);
 
@@ -561,7 +491,7 @@ function arrayParse<T extends Parser<any>>(
       }
     }
     return true;
-  }
+  };
 
   if (isUndefined(input)) {
     if (options.default !== undefined) {
@@ -574,8 +504,8 @@ function arrayParse<T extends Parser<any>>(
     } else {
       return { success: false, errors: createError(ctx, "required") };
     }
-  } else if(input === null) {
-    if(!isUndefined(options.ifnull)) {
+  } else if (input === null) {
+    if (!isUndefined(options.ifnull)) {
       const validationResult = doValidate(options.ifnull);
       if (validationResult !== true) {
         return validationResult;
@@ -623,186 +553,21 @@ function arrayParse<T extends Parser<any>>(
 
 export function $array<T extends Parser<any>>(
   item: T,
-  options: NullableOptions & ArrayParserOptions<T>,
+  options: NullableOptions & ArrayParserOptions<T>
 ): NullableParser<Array<Infer<T>>>;
 
 export function $array<T extends Parser<any>>(
   item: T,
-  options?: ArrayParserOptions<T>,
+  options?: ArrayParserOptions<T>
 ): Parser<Array<Infer<T>>>;
 
 export function $array<T extends Parser<any>>(
   item: T,
-  options?: ArrayParserOptions<T>,
+  options?: ArrayParserOptions<T>
 ): NullableParser<Array<Infer<T>>> {
   const parser = {
     parse: (input: unknown, ctx?: ParseContext) =>
       arrayParse(item, options ?? {}, input, ctx),
-  };
-  return parser;
-}
-
-//
-// $union
-//
-
-function unionParse<Ts extends Array<Parser<any>>>(
-  parsers: readonly [...Ts],
-  input: unknown,
-  ctx: ParseContext | undefined,
-): Result<Infer<Ts[number]>> {
-  ctx = createParseContext(ctx);
-
-  for (const parser of parsers) {
-    const result = (parser.parse as ParseFuncInternal)(input, ctx);
-    if (result.success) {
-      return result;
-    }
-  }
-
-  return { success: false, errors: ctx.errors };
-}
-
-export function $union<Ts extends Array<Parser<any>>>(
-  parsers: readonly [...Ts],
-): Parser<Infer<Ts[number]>> {
-  const parser = {
-    parse: (input: unknown, ctx?: ParseContext) =>
-      unionParse(parsers, input, ctx),
-  };
-  return parser;
-}
-
-//
-// $intersection
-//
-
-// https://stackoverflow.com/questions/75405517/typescript-generic-function-where-parameters-compose-into-the-return-type
-type TupleToIntersection<T extends any[]> = {
-  [I in keyof T]: (x: T[I]) => void;
-}[number] extends (x: infer R) => void
-  ? R
-  : never;
-
-type ArrayMapInfer<T> = T extends [infer x, ...infer xs]
-  ? [Infer<x>, ...ArrayMapInfer<xs>]
-  : [];
-
-function objectMerge(base: NonNullable<object>, other: NonNullable<object>, merged: any) {
-  const mergedKeys = new Set([...Object.keys(base), ...Object.keys(other)]);
-  for (const key of mergedKeys) {
-    const baseValue = (base as any)[key]
-    const otherValue = (other as any)[key];
-    if(isUndefined(baseValue)) {
-      merged[key] = otherValue;
-    } else if(isUndefined(otherValue)) {
-      merged[key] = baseValue;
-    } else {
-      const mergedValue = merge(baseValue, otherValue);
-      if(mergedValue === MERGE_FAILURE) {
-        return MERGE_FAILURE;
-      } else {
-        merged[key] = mergedValue;
-      }
-    }
-  }
-
-  return merged;
-}
-
-const MERGE_FAILURE = {};
-function merge(base: unknown, other: unknown): unknown {
-  //同じ値であればマージ不要なのでそのまま返す
-  if(base === other) {
-    return base;
-  }
-
-  if (base === MERGE_FAILURE) {
-    return other;
-  } else if (base === null || other === null) {
-    //null同士以外で、一方がnullの場合はマージ不可能なので失敗とする
-    return MERGE_FAILURE;
-  } else if (typeof base === "object") {
-    if (Array.isArray(base)) {
-      if (typeof other === "object") {
-        const merged: any = Array.isArray(other) ? [] : {};
-        return objectMerge(base, other, merged);
-      } else {
-        //object値とプリミティブ値のマージは不可能なのでnullとする
-        return MERGE_FAILURE;
-      }
-    } else {
-      if (typeof other === "object") {
-        const merged: any = {};
-        return objectMerge(base, other, merged);
-      } else {
-        //object値とプリミティブ値のマージは不可能なのでnullとする
-        return MERGE_FAILURE;
-      }
-    }
-  } else {
-    //このパーサーの仕様では、numberはstringの部分集合になるため、numberとstringをマージ可能にする
-    if (
-      (typeof other === "number" && typeof base === "string") ||
-      (typeof other === "string" && typeof base === "number")
-    ) {
-      const numBase = Number(base);
-      const numOther = Number(other);
-      if (numBase === numOther) {
-        return numBase;
-      }
-    } else if (
-      (typeof other === "boolean" && typeof base === "string") ||
-      (typeof other === "string" && typeof base === "boolean")
-    ) {
-      //このパーサーの仕様では、booleanはstringの部分集合になるため、booleanとstringをマージ可能にする
-      const boolBase =
-        typeof base === "boolean" ? base : stringToBoolean(base);
-      const boolOther =
-        typeof other === "boolean" ? other : stringToBoolean(other);
-      if (boolBase !== null && boolBase === boolOther) {
-        return boolBase;
-      }
-    }
-
-    return MERGE_FAILURE;
-  }
-}
-
-function parseIntersection<Ts extends Array<Parser<any>>>(
-  parsers: readonly [...Ts],
-  input: unknown,
-  ctx: ParseContext | undefined,
-): Result<TupleToIntersection<ArrayMapInfer<Ts>>> {
-  ctx = createParseContext(ctx);
-
-  let value:unknown = MERGE_FAILURE;
-  for (const parser of parsers) {
-    const result = (parser.parse as ParseFuncInternal)(input, ctx);
-    if (!result.success) {
-      return result;
-    }
-
-    value = merge(value, result.value);
-    //マージした結果nullとなった場合は、マージ不可能な型同士であるため、失敗とする
-    if (value === MERGE_FAILURE) {
-      break;
-    }
-  }
-
-  if (value === MERGE_FAILURE) {
-    return { success: false, errors: createError(ctx, "malformed_value") };
-  } else {
-    return success(ctx, value as TupleToIntersection<ArrayMapInfer<Ts>>);
-  }
-}
-
-export function $intersection<Ts extends Array<Parser<any>>>(
-  parsers: readonly [...Ts],
-): Parser<TupleToIntersection<ArrayMapInfer<Ts>>> {
-  const parser = {
-    parse: (input: unknown, ctx?: ParseContext) =>
-      parseIntersection(parsers, input, ctx),
   };
   return parser;
 }
@@ -814,7 +579,7 @@ export function $intersection<Ts extends Array<Parser<any>>>(
 function literalParse<T>(
   literal: T,
   input: unknown,
-  ctx: ParseContext | undefined,
+  ctx: ParseContext | undefined
 ): Result<T> {
   ctx = createParseContext(ctx);
 
@@ -874,14 +639,16 @@ interface OptionalParser<T> extends Parser<T | undefined> {
   isOptional: true;
 }
 
-function isOptionalParser<T>(parser: Parser<T | undefined>): parser is OptionalParser<T> {
+function isOptionalParser<T>(
+  parser: Parser<T | undefined>
+): parser is OptionalParser<T> {
   return (parser as OptionalParser<T>).isOptional === true;
 }
 
 function parseOptional<T>(
   inner: Parser<T>,
   input: unknown,
-  ctx?: ParseContext,
+  ctx?: ParseContext
 ): Result<T | undefined> {
   ctx = createParseContext(ctx);
   if (typeof input === "undefined") {
@@ -900,7 +667,8 @@ function parseOptional<T>(
 export function $optional<T>(inner: Parser<T>): OptionalParser<T> {
   const parser = {
     isOptional: true as const,
-    parse: (input: unknown, ctx?: ParseContext) => parseOptional(inner, input, ctx),
+    parse: (input: unknown, ctx?: ParseContext) =>
+      parseOptional(inner, input, ctx),
   };
   return parser;
 }

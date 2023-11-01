@@ -21,7 +21,7 @@ function error(
   kind: "malformed_value" | "required" | "optional_validation_failure",
   path?: (string | number)[],
   option?: string,
-  optionValue?: any,
+  optionValue?: any
 ) {
   const error = {
     kind: kind,
@@ -66,7 +66,7 @@ test("number", () => {
   expect($number.parse("      ")).toStrictEqual(success(0));
 
   expect($number.parse("100ABC")).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
   expect($number.parse(undefined)).toStrictEqual(failure(error("required")));
   expect($number.parse(null)).toStrictEqual(failure(error("malformed_value")));
@@ -80,7 +80,7 @@ test("number", () => {
 
 test("number with options", () => {
   expect($number({ min: 5 }).parse(4)).toStrictEqual(
-    failure(error("optional_validation_failure", [], "min", 5)),
+    failure(error("optional_validation_failure", [], "min", 5))
   );
   expect($number({ min: 5 }).parse(5)).toStrictEqual(success(5));
   expect($number({ min: 5 }).parse(6)).toStrictEqual(success(6));
@@ -88,16 +88,16 @@ test("number with options", () => {
   expect($number({ max: 5 }).parse(4)).toStrictEqual(success(4));
   expect($number({ max: 5 }).parse(5)).toStrictEqual(success(5));
   expect($number({ max: 5 }).parse(6)).toStrictEqual(
-    failure(error("optional_validation_failure", [], "max", 5)),
+    failure(error("optional_validation_failure", [], "max", 5))
   );
 
   expect($number({ min: 5, max: 10 }).parse(4)).toStrictEqual(
-    failure(error("optional_validation_failure", [], "min", 5)),
+    failure(error("optional_validation_failure", [], "min", 5))
   );
   expect($number({ min: 5, max: 10 }).parse(5)).toStrictEqual(success(5));
   expect($number({ min: 5, max: 10 }).parse(10)).toStrictEqual(success(10));
   expect($number({ min: 5, max: 10 }).parse(11)).toStrictEqual(
-    failure(error("optional_validation_failure", [], "max", 10)),
+    failure(error("optional_validation_failure", [], "max", 10))
   );
 
   expect($number({ allowNan: true }).parse(NaN)).toStrictEqual(success(NaN));
@@ -110,37 +110,35 @@ test("number with options", () => {
   expect($number({ nullable: true }).parse(null)).toStrictEqual(success(null));
   expect($number({ nullable: true }).parse(10)).toStrictEqual(success(10));
   expect(
-    $number({ default: 10, nullable: true }).parse(undefined),
+    $number({ default: 10, nullable: true }).parse(undefined)
   ).toStrictEqual(success(10));
   expect($number({ default: 10, nullable: true }).parse(null)).toStrictEqual(
-    success(null),
+    success(null)
   );
 
-  expect($number({ ifnull: 10 }).parse(null)).toStrictEqual(
-    success(10),
-  );
+  expect($number({ ifnull: 10 }).parse(null)).toStrictEqual(success(10));
   expect($number({ ifnull: 10, nullable: true }).parse(null)).toStrictEqual(
-    success(10),
+    success(10)
   );
 
   expect($number({ nullable: true }).parse([])).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 });
 
 test("number with validate", () => {
   expect($number({ validate: (value) => value > 0 }).parse(0)).toStrictEqual(
-    failure(error("optional_validation_failure", [], "validate", false)),
+    failure(error("optional_validation_failure", [], "validate", false))
   );
 
   expect(
     $number({
       validate: (value) => (value > 0 ? true : "error message"),
-    }).parse(0),
+    }).parse(0)
   ).toStrictEqual(
     failure(
-      error("optional_validation_failure", [], "validate", "error message"),
-    ),
+      error("optional_validation_failure", [], "validate", "error message")
+    )
   );
 });
 
@@ -166,7 +164,7 @@ test("string", () => {
 
 test("string with options", () => {
   expect($string({ min: 5 }).parse("1234")).toStrictEqual(
-    failure(error("optional_validation_failure", [], "min", 5)),
+    failure(error("optional_validation_failure", [], "min", 5))
   );
   expect($string({ min: 5 }).parse("12345")).toStrictEqual(success("12345"));
   expect($string({ min: 5 }).parse("123456")).toStrictEqual(success("123456"));
@@ -174,97 +172,97 @@ test("string with options", () => {
   expect($string({ max: 5 }).parse("1234")).toStrictEqual(success("1234"));
   expect($string({ max: 5 }).parse("12345")).toStrictEqual(success("12345"));
   expect($string({ max: 5 }).parse("123456")).toStrictEqual(
-    failure(error("optional_validation_failure", [], "max", 5)),
+    failure(error("optional_validation_failure", [], "max", 5))
   );
 
   expect($string({ min: 5, max: 10 }).parse("1234")).toStrictEqual(
-    failure(error("optional_validation_failure", [], "min", 5)),
+    failure(error("optional_validation_failure", [], "min", 5))
   );
   expect($string({ min: 5, max: 10 }).parse("12345")).toStrictEqual(
-    success("12345"),
+    success("12345")
   );
   expect($string({ min: 5, max: 10 }).parse("1234567890")).toStrictEqual(
-    success("1234567890"),
+    success("1234567890")
   );
   expect($string({ min: 5, max: 10 }).parse("12345678901")).toStrictEqual(
-    failure(error("optional_validation_failure", [], "max", 10)),
+    failure(error("optional_validation_failure", [], "max", 10))
   );
 
   expect($string({ pattern: /^hello$/ }).parse("hello")).toStrictEqual(
-    success("hello"),
+    success("hello")
   );
   expect($string({ pattern: /^\d+$/ }).parse("123")).toStrictEqual(
-    success("123"),
+    success("123")
   );
 
   expect(
-    $string({ pattern: /^[-+]?\d+(\.\d+)?$/ }).parse("-123.45"),
+    $string({ pattern: /^[-+]?\d+(\.\d+)?$/ }).parse("-123.45")
   ).toStrictEqual(success("-123.45"));
 
   expect($string({ pattern: /^\d{5,}$/ }).parse("1234")).toStrictEqual(
-    failure(error("optional_validation_failure", [], "pattern", /^\d{5,}$/)),
+    failure(error("optional_validation_failure", [], "pattern", /^\d{5,}$/))
   );
   expect($string({ pattern: /^\d$/, min: 5 }).parse("1234")).toStrictEqual(
-    failure(error("optional_validation_failure", [], "min", 5)),
+    failure(error("optional_validation_failure", [], "min", 5))
   );
 
   expect($string({ default: "hello" }).parse(undefined)).toStrictEqual(
-    success("hello"),
+    success("hello")
   );
   expect($string({ default: "hello" }).parse(null)).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 
   // If a valid value is specified and it fails to parse, the default value will be ignored.
   expect($string({ default: "hello" }).parse({})).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
   expect($string({ default: "hello" }).parse([])).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 
   expect($string({ nullable: true }).parse(undefined)).toStrictEqual(
-    failure(error("required")),
+    failure(error("required"))
   );
   expect($string({ nullable: true }).parse(null)).toStrictEqual(success(null));
   expect($string({ nullable: true }).parse("hello")).toStrictEqual(
-    success("hello"),
+    success("hello")
   );
   expect(
-    $string({ default: "hello", nullable: true }).parse(undefined),
+    $string({ default: "hello", nullable: true }).parse(undefined)
   ).toStrictEqual(success("hello"));
   expect(
-    $string({ default: "hello", nullable: true }).parse(null),
+    $string({ default: "hello", nullable: true }).parse(null)
   ).toStrictEqual(success(null));
 
-  expect(
-    $string({ ifnull: "hello" }).parse(null),
-  ).toStrictEqual(success("hello"));
+  expect($string({ ifnull: "hello" }).parse(null)).toStrictEqual(
+    success("hello")
+  );
 
   expect(
-    $string({ ifnull: "hello", nullable: true }).parse(null),
+    $string({ ifnull: "hello", nullable: true }).parse(null)
   ).toStrictEqual(success("hello"));
 
   expect($string({ nullable: true }).parse([])).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 });
 
 test("string with validate", () => {
   expect(
-    $string({ validate: (value) => value.length > 5 }).parse("abc"),
+    $string({ validate: (value) => value.length > 5 }).parse("abc")
   ).toStrictEqual(
-    failure(error("optional_validation_failure", [], "validate", false)),
+    failure(error("optional_validation_failure", [], "validate", false))
   );
 
   expect(
     $string({
       validate: (value) => (value.length > 5 ? true : "error message"),
-    }).parse("abc"),
+    }).parse("abc")
   ).toStrictEqual(
     failure(
-      error("optional_validation_failure", [], "validate", "error message"),
-    ),
+      error("optional_validation_failure", [], "validate", "error message")
+    )
   );
 });
 
@@ -279,7 +277,7 @@ test("boolean", () => {
   expect($boolean.parse("FALSE")).toStrictEqual(success(false));
 
   expect($boolean.parse("yes")).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
   expect($boolean.parse("no")).toStrictEqual(failure(error("malformed_value")));
   expect($boolean.parse("1")).toStrictEqual(failure(error("malformed_value")));
@@ -292,52 +290,50 @@ test("boolean", () => {
 
 test("boolean with options", () => {
   expect($boolean({ default: true }).parse(undefined)).toStrictEqual(
-    success(true),
+    success(true)
   );
   expect($boolean({ default: true }).parse("hello")).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 
   expect($boolean({ nullable: true }).parse(undefined)).toStrictEqual(
-    failure(error("required")),
+    failure(error("required"))
   );
   expect($boolean({ nullable: true }).parse(null)).toStrictEqual(success(null));
   expect($boolean({ nullable: true }).parse(true)).toStrictEqual(success(true));
   expect(
-    $boolean({ default: true, nullable: true }).parse(undefined),
+    $boolean({ default: true, nullable: true }).parse(undefined)
   ).toStrictEqual(success(true));
   expect($boolean({ default: true, nullable: true }).parse(null)).toStrictEqual(
-    success(null),
+    success(null)
   );
 
-  expect(
-    $boolean({ ifnull: true }).parse(null),
-  ).toStrictEqual(success(true));
+  expect($boolean({ ifnull: true }).parse(null)).toStrictEqual(success(true));
 
-  expect(
-    $boolean({ ifnull: true, nullable: true }).parse(null),
-  ).toStrictEqual(success(true));
+  expect($boolean({ ifnull: true, nullable: true }).parse(null)).toStrictEqual(
+    success(true)
+  );
 
   expect($boolean({ nullable: true }).parse([])).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 });
 
 test("boolean with validate", () => {
   expect(
-    $boolean({ validate: (value) => value === true }).parse("false"),
+    $boolean({ validate: (value) => value === true }).parse("false")
   ).toStrictEqual(
-    failure(error("optional_validation_failure", [], "validate", false)),
+    failure(error("optional_validation_failure", [], "validate", false))
   );
 
   expect(
     $boolean({
       validate: (value) => (value === true ? true : "error message"),
-    }).parse("false"),
+    }).parse("false")
   ).toStrictEqual(
     failure(
-      error("optional_validation_failure", [], "validate", "error message"),
-    ),
+      error("optional_validation_failure", [], "validate", "error message")
+    )
   );
 });
 
@@ -353,13 +349,13 @@ test("object", () => {
       a: "hello",
       b: 123,
       c: true,
-    }),
+    })
   ).toStrictEqual(
     success({
       a: "hello",
       b: 123,
       c: true,
-    }),
+    })
   );
 
   expect(
@@ -371,13 +367,13 @@ test("object", () => {
       a: "hello",
       b: "123.0",
       c: "false",
-    }),
+    })
   ).toStrictEqual(
     success({
       a: "hello",
       b: 123.0,
       c: false,
-    }),
+    })
   );
 
   expect(
@@ -393,7 +389,7 @@ test("object", () => {
         b: "123.0",
         c: "false",
       },
-    }),
+    })
   ).toStrictEqual(
     success({
       nest: {
@@ -401,7 +397,7 @@ test("object", () => {
         b: 123.0,
         c: false,
       },
-    }),
+    })
   );
 
   expect(
@@ -411,7 +407,7 @@ test("object", () => {
     }).parse({
       a: "hello",
       b: "123.0ABC",
-    }),
+    })
   ).toStrictEqual(failure(error("malformed_value", ["b"])));
 
   expect(
@@ -420,7 +416,7 @@ test("object", () => {
       b: $number,
     }).parse({
       a: "hello",
-    }),
+    })
   ).toStrictEqual(failure(error("required", ["b"])));
 });
 
@@ -433,12 +429,12 @@ test("object with options", () => {
       },
       {
         exact: true,
-      },
+      }
     ).parse({
       a: "hello",
       b: 123,
       c: "other",
-    }),
+    })
   ).toStrictEqual(failure(error("malformed_value")));
 
   expect(
@@ -448,37 +444,38 @@ test("object with options", () => {
       },
       {
         exact: false,
-      },
+      }
     ).parse({
       a: "hello",
       b: "other",
-    }),
+    })
   ).toStrictEqual(
     success({
       a: "hello",
-    }),
+    })
   );
 
   expect($object({}, { default: {} }).parse(undefined)).toStrictEqual(
-    success({}),
+    success({})
   );
-  expect($object({}, { default: {} }).parse(null)).toStrictEqual(failure(error("malformed_value")));
+  expect($object({}, { default: {} }).parse(null)).toStrictEqual(
+    failure(error("malformed_value"))
+  );
   expect($object({}, { nullable: true }).parse(undefined)).toStrictEqual(
-    failure(error("required")),
+    failure(error("required"))
   );
   expect($object({}, { nullable: true }).parse(null)).toStrictEqual(
-    success(null),
+    success(null)
   );
   expect($object({}, { nullable: true }).parse({})).toStrictEqual(success({}));
 
   expect($object({}, { ifnull: {} }).parse(null)).toStrictEqual(success({}));
 
   expect($object({}, { nullable: true }).parse("other")).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 
-  class ObjectTest
-  {
+  class ObjectTest {
     a: string;
     b: number;
 
@@ -488,15 +485,14 @@ test("object with options", () => {
     }
   }
 
-  expect($object({
-    obj: $object({
-      a: $string,
-      b: $number,
-    }),
-  }).parse({obj: new ObjectTest("hello", 123)})
-  ).toStrictEqual(success({obj: {a: "hello", b: 123}}));
-
-
+  expect(
+    $object({
+      obj: $object({
+        a: $string,
+        b: $number,
+      }),
+    }).parse({ obj: new ObjectTest("hello", 123) })
+  ).toStrictEqual(success({ obj: { a: "hello", b: 123 } }));
 });
 
 test("object with validate", () => {
@@ -505,12 +501,12 @@ test("object with validate", () => {
       {
         a: $string,
       },
-      { validate: (value) => value.a.length > 5 },
+      { validate: (value) => value.a.length > 5 }
     ).parse({
       a: "abc",
-    }),
+    })
   ).toStrictEqual(
-    failure(error("optional_validation_failure", [], "validate", false)),
+    failure(error("optional_validation_failure", [], "validate", false))
   );
 
   expect(
@@ -520,14 +516,14 @@ test("object with validate", () => {
       },
       {
         validate: (value) => (value.a.length > 5 ? true : "error message"),
-      },
+      }
     ).parse({
       a: "abc",
-    }),
+    })
   ).toStrictEqual(
     failure(
-      error("optional_validation_failure", [], "validate", "error message"),
-    ),
+      error("optional_validation_failure", [], "validate", "error message")
+    )
   );
 
   expect(
@@ -541,7 +537,7 @@ test("object with validate", () => {
     }).parse({
       a: "hello",
       b: "world",
-    }),
+    })
   ).toStrictEqual(success({ a: "hello", b: "world" }));
 
   expect(
@@ -555,9 +551,9 @@ test("object with validate", () => {
     }).parse({
       a: "hello",
       b: "world",
-    }),
+    })
   ).toStrictEqual(
-    failure(error("optional_validation_failure", ["b"], "validate", false)),
+    failure(error("optional_validation_failure", ["b"], "validate", false))
   );
 
   expect(
@@ -586,125 +582,127 @@ test("object with validate", () => {
         c: 5,
         d: 5,
       },
-    }),
+    })
   ).toStrictEqual(success({ a: "hello", b: "hello", nest: { c: 5, d: 5 } }));
 });
 
 test("array", () => {
   expect($array($string).parse([])).toStrictEqual(success([]));
   expect($array($string).parse(["hello", "world"])).toStrictEqual(
-    success(["hello", "world"]),
+    success(["hello", "world"])
   );
   expect($array($string).parse(["hello", 123])).toStrictEqual(
-    success(["hello", "123"]),
+    success(["hello", "123"])
   );
   expect($array($number).parse(["123", 456.7])).toStrictEqual(
-    success([123, 456.7]),
+    success([123, 456.7])
   );
 
   expect(
-    $array($object({ a: $string })).parse([{ a: "hello" }, { a: "world" }]),
+    $array($object({ a: $string })).parse([{ a: "hello" }, { a: "world" }])
   ).toStrictEqual(success([{ a: "hello" }, { a: "world" }]));
 
   expect($array($string).parse(undefined)).toStrictEqual(
-    failure(error("required")),
+    failure(error("required"))
   );
-  expect($array($string).parse(null)).toStrictEqual(failure(error("malformed_value")));
+  expect($array($string).parse(null)).toStrictEqual(
+    failure(error("malformed_value"))
+  );
   expect($array($string).parse("other")).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
   expect($array($string).parse({})).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
   expect($array($number).parse(["123", "other"])).toStrictEqual(
-    failure(error("malformed_value", [1])),
+    failure(error("malformed_value", [1]))
   );
 });
 
 test("array with options", () => {
   expect($array($string, { min: 2 }).parse(["hello"])).toStrictEqual(
-    failure(error("optional_validation_failure", [], "min", 2)),
+    failure(error("optional_validation_failure", [], "min", 2))
   );
   expect($array($string, { min: 2 }).parse(["hello", "world"])).toStrictEqual(
-    success(["hello", "world"]),
+    success(["hello", "world"])
   );
 
   expect($array($string, { max: 2 }).parse(["hello", "world"])).toStrictEqual(
-    success(["hello", "world"]),
+    success(["hello", "world"])
   );
   expect(
-    $array($string, { max: 2 }).parse(["hello", "world", "other"]),
+    $array($string, { max: 2 }).parse(["hello", "world", "other"])
   ).toStrictEqual(failure(error("optional_validation_failure", [], "max", 2)));
 
   expect(
-    $array($string, { default: ["hello"] }).parse(undefined),
+    $array($string, { default: ["hello"] }).parse(undefined)
   ).toStrictEqual(success(["hello"]));
   expect($array($string, { default: ["hello"] }).parse(null)).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 
   expect($array($string, { ifnull: ["hello"] }).parse(null)).toStrictEqual(
-    success(["hello"]),
+    success(["hello"])
   );
 
   expect($array($string, { nullable: true }).parse(undefined)).toStrictEqual(
-    failure(error("required")),
+    failure(error("required"))
   );
   expect($array($string, { nullable: true }).parse(null)).toStrictEqual(
-    success(null),
+    success(null)
   );
   expect($array($string, { nullable: true }).parse(["hello"])).toStrictEqual(
-    success(["hello"]),
+    success(["hello"])
   );
   expect(
-    $array($string, { default: ["hello"], nullable: true }).parse(undefined),
+    $array($string, { default: ["hello"], nullable: true }).parse(undefined)
   ).toStrictEqual(success(["hello"]));
   expect(
-    $array($string, { default: ["hello"], nullable: true }).parse(null),
+    $array($string, { default: ["hello"], nullable: true }).parse(null)
   ).toStrictEqual(success(null));
 
   expect($array($string, { nullable: true }).parse("other")).toStrictEqual(
-    failure(error("malformed_value")),
+    failure(error("malformed_value"))
   );
 });
 
 test("array with validate", () => {
   expect(
-    $array($number, { validate: (value) => value.length > 5 }).parse([1, 2, 3]),
+    $array($number, { validate: (value) => value.length > 5 }).parse([1, 2, 3])
   ).toStrictEqual(
-    failure(error("optional_validation_failure", [], "validate", false)),
+    failure(error("optional_validation_failure", [], "validate", false))
   );
 
   expect(
     $array($number, {
       validate: (value) => (value.length > 5 ? true : "error message"),
-    }).parse([1, 2, 3]),
+    }).parse([1, 2, 3])
   ).toStrictEqual(
     failure(
-      error("optional_validation_failure", [], "validate", "error message"),
-    ),
+      error("optional_validation_failure", [], "validate", "error message")
+    )
   );
 });
 
 test("union", () => {
   expect($union([$string, $number]).parse("hello")).toStrictEqual(
-    success("hello"),
+    success("hello")
   );
   expect($union([$boolean, $number]).parse(1)).toStrictEqual(success(1));
   expect($union([$boolean, $number]).parse(true)).toStrictEqual(success(true));
 
   expect(
-    $union([$boolean({ nullable: true }), $number]).parse(null),
+    $union([$boolean({ nullable: true }), $number]).parse(null)
   ).toStrictEqual(success(null));
 
   expect($union([$boolean, $number]).parse(undefined)).toStrictEqual(
-    failure(error("required"), error("required")),
+    failure(error("required"), error("required"))
   );
   expect($union([$boolean, $number]).parse(null)).toStrictEqual(
-    failure(error("malformed_value"), error("malformed_value")),
+    failure(error("malformed_value"), error("malformed_value"))
   );
   expect($union([$boolean, $number]).parse("hello")).toStrictEqual(
-    failure(error("malformed_value"), error("malformed_value")),
+    failure(error("malformed_value"), error("malformed_value"))
   );
 
   //Ambiguous case
@@ -718,7 +716,7 @@ test("intersection", () => {
     $intersection([
       $object({ a: $string }, { exact: false }),
       $object({ b: $number }, { exact: false }),
-    ]).parse({ a: "hello", b: 123 }),
+    ]).parse({ a: "hello", b: 123 })
   ).toStrictEqual(success({ a: "hello", b: 123 }));
 
   //※Special case
@@ -728,35 +726,32 @@ test("intersection", () => {
   //and "boolean & string" can be parsed as a "boolean".
   expect($intersection([$string, $number]).parse(1)).toStrictEqual(success(1));
   expect($intersection([$string, $boolean]).parse(true)).toStrictEqual(
-    success(true),
+    success(true)
   );
 
   expect(
     $intersection([
       $union([$string, $number]),
       $union([$boolean, $number]),
-    ]).parse(1),
+    ]).parse(1)
   ).toStrictEqual(success(1));
 
   expect(
     $intersection([
-      $number({nullable: true}),
-      $boolean({nullable: true}),
+      $number({ nullable: true }),
+      $boolean({ nullable: true }),
     ]).parse(null)
   ).toStrictEqual(success(null));
 
   expect(
-    $intersection([
-      $array($string),
-      $array($number),
-    ]).parse(["1", "2"])
+    $intersection([$array($string), $array($number)]).parse(["1", "2"])
   ).toStrictEqual(success([1, 2]));
 });
 
 test("literal", () => {
   expect($literal(null).parse(null)).toStrictEqual(success(null));
   expect($literal(undefined).parse(undefined)).toStrictEqual(
-    success(undefined),
+    success(undefined)
   );
   expect($literal(true).parse(true)).toStrictEqual(success(true));
   expect($literal(1).parse(1)).toStrictEqual(success(1));
@@ -765,13 +760,24 @@ test("literal", () => {
   expect($literal("16").parse(0x10)).toStrictEqual(success("16"));
   expect($literal(1).parse("1")).toStrictEqual(success(1));
   expect($literal(true).parse("true")).toStrictEqual(success(true));
-  expect($literal({ a: "test", b: 1, c: true }).parse({c: true, b: 1, a: "test"})).toStrictEqual(success({a: "test", c: true, b: 1}));
-  expect($literal([1, 2, 3, "da-"]).parse([1, 2, 3, "da-"])).toStrictEqual(success([1, 2, 3, "da-"]));
-  expect($literal([1, 2, 3]).parse([3, 2, 1])).toStrictEqual(failure(error("malformed_value")));
-  expect($literal([1, 2, 3]).parse({0: 1, 1: 2, 2: 3})).toStrictEqual(failure(error("malformed_value")));
-  expect($literal(1).parse(null)).toStrictEqual(failure(error("malformed_value")));
-  expect($literal(1).parse(undefined)).toStrictEqual(failure(error("malformed_value")));
-
+  expect(
+    $literal({ a: "test", b: 1, c: true }).parse({ c: true, b: 1, a: "test" })
+  ).toStrictEqual(success({ a: "test", c: true, b: 1 }));
+  expect($literal([1, 2, 3, "da-"]).parse([1, 2, 3, "da-"])).toStrictEqual(
+    success([1, 2, 3, "da-"])
+  );
+  expect($literal([1, 2, 3]).parse([3, 2, 1])).toStrictEqual(
+    failure(error("malformed_value"))
+  );
+  expect($literal([1, 2, 3]).parse({ 0: 1, 1: 2, 2: 3 })).toStrictEqual(
+    failure(error("malformed_value"))
+  );
+  expect($literal(1).parse(null)).toStrictEqual(
+    failure(error("malformed_value"))
+  );
+  expect($literal(1).parse(undefined)).toStrictEqual(
+    failure(error("malformed_value"))
+  );
 });
 
 test("nested_error", () => {
@@ -783,20 +789,20 @@ test("nested_error", () => {
       other: $array(
         $object({
           a: $boolean,
-        }),
+        })
       ),
     }).parse({
       nest: {
         ary: [1, 2, "other", 4, "hoge"],
       },
       other: [{ a: true }, { a: "other" }, { a: false }],
-    }),
+    })
   ).toStrictEqual(
     failure(
       error("malformed_value", ["nest", "ary", 2]),
       error("malformed_value", ["nest", "ary", 4]),
-      error("malformed_value", ["other", 1, "a"]),
-    ),
+      error("malformed_value", ["other", 1, "a"])
+    )
   );
 });
 
@@ -813,19 +819,29 @@ test("complex", () => {
   ]);
 
   expect(union.parse({ flag: true, value: "hello" })).toStrictEqual(
-    success({ flag: true, value: "hello" }),
+    success({ flag: true, value: "hello" })
   );
   expect(union.parse({ flag: false })).toStrictEqual(success({ flag: false }));
 
-  expect(union.parse({ flag: false, value: "test" })).toStrictEqual(success({ flag: false, value: "test" }));
+  expect(union.parse({ flag: false, value: "test" })).toStrictEqual(
+    success({ flag: false, value: "test" })
+  );
 });
 
 test("optional", () => {
   expect($optional($string).parse(undefined)).toStrictEqual(success(undefined));
-  expect($optional($string).parse(null)).toStrictEqual(failure(error("malformed_value")));
+  expect($optional($string).parse(null)).toStrictEqual(
+    failure(error("malformed_value"))
+  );
 
-  expect($optional($string({default: "hello"})).parse(undefined)).toStrictEqual(success("hello"));
+  expect(
+    $optional($string({ default: "hello" })).parse(undefined)
+  ).toStrictEqual(success("hello"));
 
-  expect($optional($string({ifnull: "hello"})).parse(null)).toStrictEqual(success("hello"));
-  expect($optional($string({nullable: true})).parse(null)).toStrictEqual(success(null));
+  expect($optional($string({ ifnull: "hello" })).parse(null)).toStrictEqual(
+    success("hello")
+  );
+  expect($optional($string({ nullable: true })).parse(null)).toStrictEqual(
+    success(null)
+  );
 });

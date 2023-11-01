@@ -1,4 +1,4 @@
-export type { Infer, Parser } from "./Parser";
+export type { Infer, Parser, Result } from "./Parser";
 export {
   $number,
   $string,
