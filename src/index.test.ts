@@ -13,6 +13,7 @@ import {
   $optional,
   $date,
 } from "./index";
+import { emailValidator } from "./Validator";
 
 function success<T>(actual: T) {
   return { success: true, value: actual };
@@ -264,6 +265,20 @@ test("string with validate", () => {
     failure(
       error("optional_validation_failure", [], "validate", "error message")
     )
+  );
+
+  expect(
+    $string({
+      validate: emailValidator,
+    }).parse("abc@example.com")
+  ).toStrictEqual(success("abc@example.com"));
+
+  expect(
+    $string({
+      validate: emailValidator,
+    }).parse("abc")
+  ).toStrictEqual(
+    failure(error("optional_validation_failure", [], "validate", false))
   );
 });
 
