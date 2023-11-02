@@ -52,7 +52,6 @@
   },
   "devDependencies": {
     "@vitest/coverage-istanbul": "^0.34.6",
-    "@vitest/ui": "^0.34.6",
     "prettier": "^3.0.3",
     "typescript": "^5.2.2",
     "vite": "^4.4.11",
