@@ -9,7 +9,7 @@ export default defineConfig({
     lib: {
       entry: path.resolve(__dirname, "src", "index.ts"),
       formats: ["es", "cjs"],
-      name: "ync",
+      name: "yncc",
       fileName: "[format]/[name]",
     },
     target: "esnext",

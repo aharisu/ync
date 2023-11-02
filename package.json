@@ -1,7 +1,7 @@
 {
-  "name": "@aharisu/ync",
+  "name": "yncc",
   "version": "0.0.2",
-  "description": "Ync is a validator and parser inspired by lizod, which in turn was inspired by zod.",
+  "description": "Yncc is a validator and parser inspired by lizod, which in turn was inspired by zod.",
   "keywords": [
     "typescript",
     "schema",
@@ -10,7 +10,7 @@
     "zod"
   ],
   "bugs": {
-    "url": "https://github.com/aharisu/ync/issues"
+    "url": "https://github.com/aharisu/yncc/issues"
   },
   "type": "module",
   "main": "dist/cjs/index.cjs",
@@ -40,7 +40,7 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/aharisu/ync.git"
+    "url": "git+https://github.com/aharisu/yncc.git"
   },
   "author": "aharisu",
   "license": "MIT",

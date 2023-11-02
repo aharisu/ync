@@ -736,7 +736,7 @@ test("intersection", () => {
   ).toStrictEqual(success({ a: "hello", b: 123 }));
 
   //※Special case
-  //Due to the specifications of the ync parser,
+  //Due to the specifications of the yncc parser,
   //$number and $boolean are subsets of $string.
   //Therefore, in TypeScript, while "number & string" which becomes "never" can be parsed as a "number" in this parser,
   //and "boolean & string" can be parsed as a "boolean".
