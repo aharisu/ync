@@ -806,7 +806,7 @@ test("date", () => {
   );
   //ISO Date String no timezone
   expect($date.parse("2020-01-01T00:00:00")).toStrictEqual(
-    success(new Date(Date.UTC(2019, 11, 31, 15, 0, 0, 0)))
+    success(new Date(2020, 0, 1))
   );
 
   //ISO Date String with timezone
