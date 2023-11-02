@@ -11,6 +11,7 @@ import {
   Infer,
   $literal,
   $optional,
+  $date,
 } from "./index";
 
 function success<T>(actual: T) {
@@ -776,6 +777,104 @@ test("literal", () => {
     failure(error("malformed_value"))
   );
   expect($literal(1).parse(undefined)).toStrictEqual(
+    failure(error("malformed_value"))
+  );
+});
+
+test("date", () => {
+  expect($date.parse("2020-01-01")).toStrictEqual(
+    success(new Date(2020, 0, 1))
+  );
+  //ISO Date String
+  expect($date.parse("2020-01-01T00:00:00.000+09:00")).toStrictEqual(
+    success(new Date(Date.UTC(2019, 11, 31, 15, 0, 0, 0)))
+  );
+  //ISO Date String no timezone
+  expect($date.parse("2020-01-01T00:00:00")).toStrictEqual(
+    success(new Date(Date.UTC(2019, 11, 31, 15, 0, 0, 0)))
+  );
+
+  //ISO Date String with timezone
+  expect($date.parse("2020-01-01T00:00:00Z")).toStrictEqual(
+    success(new Date(Date.UTC(2020, 0, 1, 0, 0, 0, 0)))
+  );
+
+  //ISO Date String Y-m-d only
+  expect($date.parse("2020-01-01")).toStrictEqual(
+    success(new Date(Date.UTC(2019, 11, 31, 15, 0, 0, 0)))
+  );
+
+  //
+  //with format string
+  //
+
+  expect(
+    $date({
+      formatOptions: {
+        format: "yyyy-MM-dd",
+      },
+    }).parse("2020-01-01")
+  ).toStrictEqual(success(new Date(2020, 0, 1)));
+
+  // not specified formatOptions.referenceDate (default: Date.now())
+  expect(
+    $date({
+      formatOptions: {
+        format: "MM-dd",
+      },
+    }).parse("01-01")
+  ).toStrictEqual(success(new Date(new Date(Date.now()).getFullYear(), 0, 1)));
+
+  expect(
+    $date({
+      formatOptions: {
+        format: "MM-dd",
+        referenceDate: new Date(2020, 0, 1),
+      },
+    }).parse("01-01")
+  ).toStrictEqual(success(new Date(2020, 0, 1)));
+
+  expect(
+    $date({
+      formatOptions: {
+        format: "yyyy年MM月dd日",
+      },
+    }).parse("2020年1月1日")
+  ).toStrictEqual(success(new Date(2020, 0, 1)));
+});
+
+test("date with options", () => {
+  const date = new Date(2020, 0, 1);
+  expect($date({ default: date }).parse(undefined)).toStrictEqual(
+    success(new Date(2020, 0, 1))
+  );
+  expect($date({ default: date }).parse("hello")).toStrictEqual(
+    failure(error("malformed_value"))
+  );
+
+  expect($date({ nullable: true }).parse(undefined)).toStrictEqual(
+    failure(error("required"))
+  );
+  expect($date({ nullable: true }).parse(null)).toStrictEqual(success(null));
+  expect($date({ nullable: true }).parse("2020-01-01")).toStrictEqual(
+    success(new Date(2020, 0, 1))
+  );
+  expect(
+    $date({ default: date, nullable: true }).parse(undefined)
+  ).toStrictEqual(success(new Date(2020, 0, 1)));
+  expect($date({ default: date, nullable: true }).parse(null)).toStrictEqual(
+    success(null)
+  );
+
+  expect($date({ ifnull: date }).parse(null)).toStrictEqual(
+    success(new Date(2020, 0, 1))
+  );
+
+  expect($date({ ifnull: date, nullable: true }).parse(null)).toStrictEqual(
+    success(new Date(2020, 0, 1))
+  );
+
+  expect($date({ nullable: true }).parse([])).toStrictEqual(
     failure(error("malformed_value"))
   );
 });

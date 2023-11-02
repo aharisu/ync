@@ -1,6 +1,7 @@
 import {
   $array,
   $boolean,
+  $date,
   $literal,
   $number,
   $object,
@@ -187,6 +188,36 @@ test("literal", () => {
 
   //NaN is not literal
   expectTypeOf($literal(NaN)).toEqualTypeOf<Parser<number>>();
+});
+
+test("date", () => {
+  const date = new Date();
+
+  expectTypeOf($date()).toEqualTypeOf<Parser<Date>>();
+  expectTypeOf($date({ default: date })).toEqualTypeOf<Parser<Date>>();
+  expectTypeOf($date({ nullable: false })).toEqualTypeOf<Parser<Date>>();
+  expectTypeOf($date({ default: date, nullable: false })).toEqualTypeOf<
+    Parser<Date>
+  >();
+
+  expectTypeOf($date({ ifnull: date, nullable: true })).toEqualTypeOf<
+    Parser<Date>
+  >();
+  expectTypeOf($date({ ifnull: date, nullable: false })).toEqualTypeOf<
+    Parser<Date>
+  >();
+
+  //nullable pattern
+  expectTypeOf($date({ nullable: true })).toEqualTypeOf<Parser<Date | null>>();
+  expectTypeOf($date({ nullable: true, default: undefined })).toEqualTypeOf<
+    Parser<Date | null>
+  >();
+  expectTypeOf($date({ nullable: true, default: date })).toEqualTypeOf<
+    Parser<Date | null>
+  >();
+  expectTypeOf($date({ nullable: true, ifnull: undefined })).toEqualTypeOf<
+    Parser<Date | null>
+  >();
 });
 
 test("complex", () => {

@@ -10,4 +10,6 @@ export {
 
 export { $union, $intersection } from "./CompositeType";
 
+export { $date } from "./DateType";
+
 export type { Infer, Parser, Result } from "./type";

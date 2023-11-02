@@ -103,3 +103,6 @@ export function stringToBoolean(str: string): boolean | null {
     return null;
   }
 }
+
+// Hack to get TypeScript to show simplified types in error messages
+export type Pretty<T> = { [K in keyof T]: T[K] } & {};

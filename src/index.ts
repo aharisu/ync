@@ -8,5 +8,6 @@ export {
   $union,
   $intersection,
   $literal,
+  $date,
   $optional,
 } from "./Parser";

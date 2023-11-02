@@ -8,6 +8,7 @@ import {
   NullableResult,
   ParseContext,
   ParseFuncInternal,
+  Pretty,
   createError,
   createOptionalError,
   createParseContext,
@@ -310,9 +311,6 @@ $boolean.parse = ((input: unknown, ctx?: ParseContext) =>
 //
 // $object
 //
-
-// Hack to get TypeScript to show simplified types in error messages
-type Pretty<T> = { [K in keyof T]: T[K] } & {};
 
 type ObjectMapInfer<Map extends Record<string, Parser<any>>> = Pretty<
   {
