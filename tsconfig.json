@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "rootDir": "src",
     "outDir": "dist",
+    "types": ["vitest/importMeta"]
   },
   "include": ["src"]
 }

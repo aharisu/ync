@@ -12,6 +12,8 @@ dist
 dist-ssr
 *.local
 coverage
+playground
+tsconfig.vitest-temp.json
 
 package-lock.json
 pnpm-lock.yaml
