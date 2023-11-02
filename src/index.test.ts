@@ -816,7 +816,7 @@ test("date", () => {
 
   //ISO Date String Y-m-d only
   expect($date.parse("2020-01-01")).toStrictEqual(
-    success(new Date(Date.UTC(2019, 11, 31, 15, 0, 0, 0)))
+    success(new Date(2020, 0, 1))
   );
 
   //
