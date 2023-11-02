@@ -1,6 +1,6 @@
 {
   "name": "yncc",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Yncc is a validator and parser inspired by lizod, which in turn was inspired by zod.",
   "keywords": [
     "typescript",
