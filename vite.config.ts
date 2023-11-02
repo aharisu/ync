@@ -35,4 +35,7 @@ export default defineConfig({
       reporter: ["text", "json", "html"],
     },
   },
+  define: {
+    "import.meta.vitest": "undefined",
+  },
 });
