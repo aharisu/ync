@@ -27,14 +27,13 @@ const cardStyle = css({
 
 export default function Home() {
   return (
-    <main
+    <div
       className={css({
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
         alignItems: "center",
         padding: "6rem",
-        minHeight: "100vh",
       })}
     >
       <div
@@ -198,6 +197,6 @@ export default function Home() {
           </p>
         </a>
       </div>
-    </main>
+    </div>
   );
 }
