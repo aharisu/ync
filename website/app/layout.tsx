@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import { cx } from "@/styled-system/css";
 import { flex } from "@/styled-system/patterns";
+import { MainNavigation } from "@/components/MainNavigation";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -44,7 +45,7 @@ export default function RootLayout({
             flex: "1 1 auto",
           })}
         >
-          <nav
+          <div
             className={flex({
               width: "20rem",
               minWidth: "20rem",
@@ -52,8 +53,8 @@ export default function RootLayout({
               overflow: "auto",
             })}
           >
-            Side navigation
-          </nav>
+            <MainNavigation />
+          </div>
           <main
             className={flex({
               flex: "1 1 auto",
