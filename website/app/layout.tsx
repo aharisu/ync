@@ -34,7 +34,6 @@ export default function RootLayout({
             minHeight: "3rem",
             maxHeight: "3rem",
             width: "100%",
-            background: "red",
             justify: "center",
           })}
         >
@@ -43,7 +42,6 @@ export default function RootLayout({
         <div
           className={flex({
             flex: "1 1 auto",
-            background: "yellow",
           })}
         >
           <nav
@@ -51,7 +49,6 @@ export default function RootLayout({
               width: "20rem",
               minWidth: "20rem",
               maxWidth: "20rem",
-              background: "green",
               overflow: "auto",
             })}
           >
@@ -60,7 +57,6 @@ export default function RootLayout({
           <main
             className={flex({
               flex: "1 1 auto",
-              background: "blue",
             })}
           >
             {children}
@@ -72,8 +68,8 @@ export default function RootLayout({
             minHeight: "1.5rem",
             maxHeight: "1.5rem",
             width: "100%",
-            background: "red",
             justify: "center",
+            background: "var(--background-secondary)",
           })}
         >
           Footer
