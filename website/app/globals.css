@@ -1,1 +1,21 @@
 @layer reset, base, tokens, recipes, utilities;
+
+h1 {
+    font: 600 1.4rem "Inter";
+    margin-bottom: 2rem;
+    word-break: break-word;    
+}
+
+h2 {
+    font-size: 1.2rem;
+    margin: 4rem 0 0.5rem;
+}
+
+h3 {
+    font-size: 1.1rem;
+    margin: 2rem 0 0.5rem;
+}
+
+p {
+    margin: 1rem 0 2rem;
+}
