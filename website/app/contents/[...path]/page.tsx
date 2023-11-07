@@ -3,6 +3,8 @@ import { Content, getAllContents } from "@/libs/content/getAllContents";
 import markdownToHtml from "@/libs/markdown/markdownToHtml";
 import getMarkdown from "@/libs/markdown/getMarkdown";
 
+import "@/app/prism.css";
+
 type Props = {
   params: {
     path: string[];
@@ -10,7 +12,7 @@ type Props = {
 };
 
 export default async function Page({ params: { path } }: Props) {
-  const filepath = `contents/${path.join("/")}.md`;
+  const filepath = decodeURIComponent(`contents/${path.join("/")}.md`);
   const markdown = await getMarkdown(filepath);
   const html = await markdownToHtml(markdown);
 
