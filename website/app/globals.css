@@ -40,10 +40,17 @@ span.code-name {
 
 table {
   width: 100%;
+  border: 1px solid #858585;
+  border-radius: 0.25rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  padding: 0.25rem;
 }
 
 th {
   font-weight: bold;
+  padding: 0.3rem 0;
+  border-bottom: 1px solid #858585;
 }
 
 td {

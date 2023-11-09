@@ -54,7 +54,7 @@ NaNの場合はallowNaNオプションにtrueを指定しない限りは失敗�
 | :a[allowNaN]{href="#allownan-boolean"} | :span[boolean]{.type}           | NaNを許可します。                                |
 | :a[min]{href="#min-number"}      | :span[number]{.type}            | 最小値を指定します。                             |
 | :a[max]{href="#max-number"}      | :span[number]{.type}            | 最大値を指定します。                             |
-| :a[validate]{href="#validate-validatornumber"} | :span[Validator<number>]{.type} | 値を検証する関数を指定します。                   |
+| :a[validate]{href="#validate-validatornumber"} | :span[Validator\<number\>]{.type} | 値を検証する関数を指定します。                   |
 
 ---
 
