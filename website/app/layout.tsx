@@ -24,8 +24,9 @@ export default function RootLayout({
           inter.className,
           flex({
             direction: "column",
-            minHeight: "100vh",
-            minWidth: "100vw",
+            height: "100vh",
+            width: "100vw",
+            overflow: "hidden",
           })
         )}
       >
@@ -43,6 +44,7 @@ export default function RootLayout({
         <div
           className={flex({
             flex: "1 1 auto",
+            height: 0,
           })}
         >
           <div

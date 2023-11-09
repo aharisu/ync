@@ -25,8 +25,27 @@ const globalCss = defineGlobalStyles({
       "--background-primary": "#1b1b1b",
       "--background-secondary": "#343434",
       "--background-tertiary": "#4e4e4e",
+      "--code-background-inline": "#343434",
+      "--code-background-block": "#343434",
+      "--color-button-track": "#444444",
+      "--color-button-thumb": "#AAAAAA",
     },
     html: { colorScheme: "dark" },
+  },
+
+  "::-webkit-scrollbar": {
+    width: "10px",
+    height: "8px",
+  },
+
+  "::-webkit-scrollbar-thumb": {
+    background: "var(--color-button-thumb)",
+    borderRadius: "10px",
+  },
+
+  "::-webkit-scrollbar-track": {
+    background: "var(--color-button-track)",
+    borderRadius: "10px",
   },
 });
 

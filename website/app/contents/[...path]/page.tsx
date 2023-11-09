@@ -4,6 +4,8 @@ import markdownToHtml from "@/libs/markdown/markdownToHtml";
 import getMarkdown from "@/libs/markdown/getMarkdown";
 
 import "@/app/prism.css";
+import { css } from "@/styled-system/css";
+import { flex } from "@/styled-system/patterns";
 
 type Props = {
   params: {
@@ -16,7 +18,19 @@ export default async function Page({ params: { path } }: Props) {
   const markdown = await getMarkdown(filepath);
   const html = await markdownToHtml(markdown);
 
-  return <div dangerouslySetInnerHTML={{ __html: html }}></div>;
+  return (
+    <div
+      className={css({
+        flex: "1 1 auto",
+        width: 0,
+        padding: "1rem",
+        overflowWrap: "break-word",
+        overflowY: "auto",
+      })}
+    >
+      <div dangerouslySetInnerHTML={{ __html: html }} />
+    </div>
+  );
 }
 
 export async function generateStaticParams() {

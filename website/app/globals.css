@@ -1,21 +1,64 @@
 @layer reset, base, tokens, recipes, utilities;
 
 h1 {
-    font: 600 1.4rem "Inter";
-    margin-bottom: 2rem;
-    word-break: break-word;    
+  font: 600 1.4rem "Inter";
+  margin-bottom: 2rem;
+  word-break: break-word;
 }
 
 h2 {
-    font-size: 1.2rem;
-    margin: 4rem 0 0.5rem;
+  font-size: 1.2rem;
+  margin: 2rem 0 0.5rem;
 }
 
 h3 {
-    font-size: 1.1rem;
-    margin: 2rem 0 0.5rem;
+  font-size: 1.1rem;
+  margin: 2rem 0 0.5rem;
 }
 
 p {
-    margin: 1rem 0 2rem;
+  margin: 1rem 0;
+}
+
+hr {
+  box-sizing: content-box;
+  overflow: visible;
+  border: none;
+  border-top: 1px solid #516391;
+  margin: 10px 0;
+  display: block;
+}
+
+code {
+  background: var(--code-background-inline);
+  padding: 0.125rem 0.25rem;
+  width: -webkit-fit-content;
+  width: -moz-fit-content;
+  border-radius: 0.25rem;
+  font-size: 0.9rem;
+}
+
+table {
+  width: 100%;
+}
+
+th {
+  font-weight: bold;
+}
+
+td {
+  padding: 6px 15px 6px 0;
+  line-height: 1.4;
+}
+
+td:last-child {
+  padding-right: 0;
+}
+
+span.type {
+  font-weight: 400;
+  font-size: 0.9rem;
+  font-feature-settings: none;
+  font-variant-ligatures: none;
+  color: #ec5990;
 }
