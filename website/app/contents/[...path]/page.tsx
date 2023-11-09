@@ -28,7 +28,24 @@ export default async function Page({ params: { path } }: Props) {
         overflowY: "auto",
       })}
     >
-      <div dangerouslySetInnerHTML={{ __html: html }} />
+      <div
+        className={css({
+          display: "grid",
+          gridTemplateColumns: "minmax(0, 2.5fr) minmax(0, 16rem)",
+          gridGap: "1rem",
+          "& > .contents": {
+            gridColumn: "1 / 2",
+          },
+          "& > .toc-container": {
+            gridColumn: "2 / 3",
+            height: "fit-content",
+            position: "sticky",
+            top: "1rem",
+            padding: "1rem",
+          },
+        })}
+        dangerouslySetInnerHTML={{ __html: html }}
+      />
     </div>
   );
 }

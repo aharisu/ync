@@ -1,18 +1,18 @@
 @layer reset, base, tokens, recipes, utilities;
 
 h1 {
-  font: 600 1.4rem "Inter";
+  font: 600 1.5rem "Inter";
   margin-bottom: 2rem;
   word-break: break-word;
 }
 
 h2 {
-  font-size: 1.2rem;
+  font-size: 1.3rem "Inter";
   margin: 2rem 0 0.5rem;
 }
 
 h3 {
-  font-size: 1.1rem;
+  font-size: 1.2rem "Inter";
   margin: 2rem 0 0.5rem;
 }
 
@@ -29,7 +29,7 @@ hr {
   display: block;
 }
 
-code {
+span.code-name {
   background: var(--code-background-inline);
   padding: 0.125rem 0.25rem;
   width: -webkit-fit-content;
@@ -61,4 +61,32 @@ span.type {
   font-feature-settings: none;
   font-variant-ligatures: none;
   color: #ec5990;
+}
+
+.contents a {
+  color: var(--text-link);
+  text-decoration: underline;
+}
+
+.toc {
+  font-size: 0.83rem;
+  padding-left: 0;
+}
+
+.toc-title {
+  letter-spacing: 1.5px;
+  margin: 0 0 1rem;
+}
+
+.toc-link {
+  border-left: 2px solid #696969;
+  color: #cdcdcd;
+  display: block;
+  padding: 0.5rem 0rem 0.5rem 1rem;
+  text-decoration: none;
+}
+
+.toc-link:hover {
+  border-left: 2px solid #5994ec;
+  color: #5994ec;
 }

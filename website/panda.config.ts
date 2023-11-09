@@ -22,6 +22,7 @@ const globalCss = defineGlobalStyles({
   "@media (prefers-color-scheme: dark)": {
     ":root": {
       "--text-primary": "rgb(255, 2550, 255)",
+      "--text-link": "#8cb4ff",
       "--background-primary": "#1b1b1b",
       "--background-secondary": "#343434",
       "--background-tertiary": "#4e4e4e",

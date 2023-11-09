@@ -1,3 +1,5 @@
+:::article{.contents}
+
 # $number
 
 入力が数値であることを検証します。
@@ -20,7 +22,7 @@ $number.parse("Hello world"); // ⛔ failure
 $number.parse(true); // ⛔ failure
 $number.parse({}); // ⛔ failure
 
-$number({ nullable: true }).parse(null); // success
+$number({ nullable: true }).parse(null); // ✅ success
 ```
 
 ## パースルール
@@ -32,29 +34,31 @@ NaNの場合はallowNaNオプションにtrueを指定しない限りは失敗�
 
 ### 例
 
-- ✅ "32" => 32
-- ✅ "0x20" => 32
-- ✅ "0o40" => 32
-- ✅ "0b100000" => 32
-- ✅ "32.0" => 32
-- ⛔ "Hello world"
-- ⛔ "32px"
+```typescript
+✅ "32" => 32
+✅ "0x20" => 32
+✅ "0o40" => 32
+✅ "0b100000" => 32
+✅ "32.0" => 32
+⛔ "Hello world"
+⛔ "32px"
+```
 
 ## オプション
 
 | 名称     | 型                | 説明                                             |
 | :------- | :---------------- | :----------------------------------------------- |
-| default  | :span[number]{.type}            | 入力値が存在しない場合に代用する値を指定します。 |
-| nullable | :span[boolean]{.type}           | nullを許可します。                               |
-| ifnull   | :span[number]{.type}            | nullの場合の値を指定します。                     |
-| allowNaN | :span[boolean]{.type}           | NaNを許可します。                                |
-| min      | :span[number]{.type}            | 最小値を指定します。                             |
-| max      | :span[number]{.type}            | 最大値を指定します。                             |
-| validate | :span[Validator<number>]{.type} | 値を検証する関数を指定します。                   |
+| :a[default]{href="#default-number"}  | :span[number]{.type}            | 入力値が存在しない場合に代用する値を指定します。 |
+| :a[nullable]{href="#nullable-boolean"} | :span[boolean]{.type}           | nullを許可します。                               |
+| :a[ifnull]{href="#ifnull-number"}   | :span[number]{.type}            | nullの場合の値を指定します。                     |
+| :a[allowNaN]{href="#allownan-boolean"} | :span[boolean]{.type}           | NaNを許可します。                                |
+| :a[min]{href="#min-number"}      | :span[number]{.type}            | 最小値を指定します。                             |
+| :a[max]{href="#max-number"}      | :span[number]{.type}            | 最大値を指定します。                             |
+| :a[validate]{href="#validate-validatornumber"} | :span[Validator<number>]{.type} | 値を検証する関数を指定します。                   |
 
 ---
 
-### `default`: :span[number]{.type}
+### :span[default]{.code-name}: :span[number]{.type}
 
 入力値が存在しない場合に代用する値を指定します:br
 undefinedのみ適用され、nullには適用されません。nullの代替値を指定したい場合はifnullオプションを使用してください。
@@ -70,7 +74,7 @@ $number({ default: 42 }).parse(null);
 
 ---
 
-### `nullable`: :span[boolean]{.type}
+### :span[nullable]{.code-name}: :span[boolean]{.type}
 
 trueを指定した場合、nullの入力値を許可します。:br
 nullにのみ適用され、undefinedには適用されません。undefinedを許可したい場合は$option関数を使用してください。
@@ -98,7 +102,7 @@ const v3 = $number({ nullable: true, ifnull: 0 }).parse(1).value;
 
 ---
 
-### `ifnull`: :span[number]{.type}
+### :span[ifnull]{.code-name}: :span[number]{.type}
 
 入力値がnullの場合に代用する値を指定します。:br
 nullにのみ適用され、undefinedには適用されません。undefinedの代替値を指定したい場合はdefaultオプションを使用してください。
@@ -114,7 +118,7 @@ $number({ ifnull: 42 }).parse(undefined);
 
 ---
 
-### `allowNaN`: :span[boolean]{.type}
+### :span[allowNaN]{.code-name}: :span[boolean]{.type}
 
 trueを指定した場合、NaNの入力値を許可します。:br
 allowNaNがfalseもしくは何も指定しない場合、入力値がNaNの場合は常に失敗します。:br
@@ -130,7 +134,7 @@ $number({ allowNaN: true, min: 5, max: 10 }).parse(NaN);
 
 ---
 
-### `min`: :span[number]{.type}
+### :span[min]{.code-name}: :span[number]{.type}
 
 入力値が指定した値より小さい場合に失敗します。:br
 値の検証はdefaultやifnullで指定した値にも適用されます。
@@ -152,7 +156,7 @@ $number({ min 5 }).parse(4);
 
 ---
 
-### `max`: :span[number]{.type}
+### :span[max]{.code-name}: :span[number]{.type}
 
 入力値が指定した値より大きい場合に失敗します。:br
 値の検証はdefaultやifnullで指定した値にも適用されます。
@@ -174,7 +178,7 @@ $number({ max 5 }).parse(6);
 
 ---
 
-### `validate`: :span[Validator\<number\>]{.type}
+### :span[validate]{.code-name}: :span[Validator\<number\>]{.type}
 
 入力値を検証するカスタム関数を指定します。
 
@@ -210,3 +214,5 @@ $number({
 //   ]
 // }
 ```
+
+:::
