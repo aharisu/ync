@@ -1,6 +1,7 @@
 import { css } from "@/styled-system/css";
 import { Content } from "../../libs/content/getAllContents";
 import contentToHref from "@/libs/content/contentToHref";
+import { BiChevronsDown } from "react-icons/bi";
 
 type Item =
   | {
@@ -47,13 +48,26 @@ export const Item = ({ content }: Props) => {
         <div>
           <div
             className={css({
+              display: "inline-flex",
+              alignItems: "center",
               fontSize: "1.1rem",
               fontWeight: "bold",
             })}
           >
-            {content.name}
+            <BiChevronsDown />
+            <span
+              className={css({
+                marginLeft: "0.5rem",
+              })}
+            >
+              {content.name}
+            </span>
           </div>
-          <ul>
+          <ul
+            className={css({
+              marginLeft: "0.5rem",
+            })}
+          >
             {content.contents.map((content) => (
               <Item key={content.path} content={content} />
             ))}

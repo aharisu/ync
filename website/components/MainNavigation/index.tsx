@@ -3,6 +3,8 @@ import { Item } from "./Item";
 import { getAllContents } from "../../libs/content/getAllContents";
 import { css } from "@/styled-system/css";
 
+import { RxHome } from "react-icons/rx";
+
 export const MainNavigation = () => {
   const contents = getAllContents("contents");
   //console.dir(contents, {
@@ -42,11 +44,20 @@ export const MainNavigation = () => {
         >
           <a
             className={css({
+              display: "inline-flex",
+              alignItems: "center",
               padding: "0.25rem 0.5rem",
             })}
             href="/"
           >
-            Home
+            <RxHome />
+            <span
+              className={css({
+                marginLeft: "1rem",
+              })}
+            >
+              Home
+            </span>
           </a>
         </div>
 
