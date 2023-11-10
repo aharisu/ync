@@ -414,13 +414,23 @@ function objectParse<Map extends Record<string, Parser<any>>>(
   if (failed) {
     return { success: false, errors: ctx.errors };
   }
-  if ((options.exact ?? true) && unchecked.size > 0) {
-    return { success: false, errors: createError(ctx, "malformed_value") };
-  } else {
-    const validationResult = doValidate(parsedObj);
-    if (validationResult !== true) {
-      return validationResult;
+
+  //入力オブジェクト内にまだ未チェックのフィールドが残っているなら
+  if (unchecked.size > 0) {
+    //スキーマ定義と完全一致する必要がある場合はエラー
+    if (options.exact ?? true) {
+      return { success: false, errors: createError(ctx, "malformed_value") };
     }
+    //ルーズなマッチングを許可する場合は、検証結果のオブジェクトに入力値の値をそのまま追加する
+    for (const key of unchecked) {
+      const item = (input as Record<string, any>)[key];
+      parsedObj[key as keyof ObjectMapInfer<Map>] = item;
+    }
+  }
+
+  const validationResult = doValidate(parsedObj);
+  if (validationResult !== true) {
+    return validationResult;
   }
 
   return success(ctx, parsedObj);

@@ -468,6 +468,7 @@ test("object with options", () => {
   ).toStrictEqual(
     success({
       a: "hello",
+      b: "other",
     })
   );
 
