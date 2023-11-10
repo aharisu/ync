@@ -1,18 +1,18 @@
 @layer reset, base, tokens, recipes, utilities;
 
 h1 {
-  font: 600 1.5rem "Inter";
+  font: 600 3rem "Inter";
   margin-bottom: 2rem;
   word-break: break-word;
 }
 
 h2 {
-  font-size: 1.3rem "Inter";
+  font: 500 1.75rem "Inter";
   margin: 2rem 0 0.5rem;
 }
 
 h3 {
-  font-size: 1.2rem "Inter";
+  font: 500 1.25rem "Inter";
   margin: 2rem 0 0.5rem;
 }
 
@@ -82,7 +82,7 @@ span.type {
 
 .toc-title {
   letter-spacing: 1.5px;
-  margin: 0 0 1rem;
+  margin: 0 0 -10px;
 }
 
 .toc-link {

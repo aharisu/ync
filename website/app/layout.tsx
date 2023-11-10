@@ -49,9 +49,9 @@ export default function RootLayout({
         >
           <div
             className={flex({
-              width: "20rem",
-              minWidth: "20rem",
-              maxWidth: "20rem",
+              width: "15rem",
+              minWidth: "15rem",
+              maxWidth: "15rem",
               overflow: "auto",
             })}
           >

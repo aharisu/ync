@@ -64,6 +64,10 @@ function customizeTOC(toc: any) {
                   },
                 ],
               },
+              {
+                type: "element",
+                tagName: "hr",
+              },
             ],
           },
           toc,

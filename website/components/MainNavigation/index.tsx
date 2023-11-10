@@ -1,6 +1,7 @@
 import { flex } from "@/styled-system/patterns";
 import { Item } from "./Item";
 import { getAllContents } from "../../libs/content/getAllContents";
+import { css } from "@/styled-system/css";
 
 export const MainNavigation = () => {
   const contents = getAllContents("contents");
@@ -9,18 +10,52 @@ export const MainNavigation = () => {
   //});
 
   return (
-    <nav
+    <aside
       className={flex({
         flex: "1 1 auto",
         direction: "column",
+        padding: "2rem",
       })}
     >
-      <h2>Main Navigation</h2>
-      <ul>
-        {contents.map((content) => (
-          <Item key={content.path} content={content} />
-        ))}
-      </ul>
-    </nav>
+      <nav
+        className={flex({
+          direction: "column",
+        })}
+      >
+        <h2
+          className={css({
+            margin: "1rem 0 -10px 0!important",
+          })}
+        >
+          Menu
+        </h2>
+        <hr />
+
+        <div
+          className={css({
+            fontSize: "1.2rem",
+            marginLeft: "-0.5rem",
+            "& :hover": {
+              color: "#5994ec",
+            },
+          })}
+        >
+          <a
+            className={css({
+              padding: "0.25rem 0.5rem",
+            })}
+            href="/"
+          >
+            Home
+          </a>
+        </div>
+
+        <ul>
+          {contents.map((content) => (
+            <Item key={content.path} content={content} />
+          ))}
+        </ul>
+      </nav>
+    </aside>
   );
 };
