@@ -14,7 +14,7 @@ type Props = {
 };
 
 export default async function Page({ params: { path } }: Props) {
-  const filepath = decodeURIComponent(`contents/${path.join("/")}.md`);
+  const filepath = decodeURIComponent(`contents/${path.join("/")}`);
   const markdown = await getMarkdown(filepath);
   const html = await markdownToHtml(markdown);
 
