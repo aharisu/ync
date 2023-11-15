@@ -6,6 +6,7 @@ import getMarkdown from "@/libs/markdown/getMarkdown";
 import "@/app/prism.css";
 import { css } from "@/styled-system/css";
 import { flex } from "@/styled-system/patterns";
+import { MainNavigation } from "@/components/MainNavigation";
 
 type Props = {
   params: {
@@ -16,36 +17,63 @@ type Props = {
 export default async function Page({ params: { path } }: Props) {
   const filepath = decodeURIComponent(`contents/${path.join("/")}`);
   const markdown = await getMarkdown(filepath);
-  const html = await markdownToHtml(markdown);
+  const [contentsHtml, tocHtml] = await markdownToHtml(markdown);
 
   return (
     <div
       className={css({
-        flex: "1 1 auto",
-        width: 0,
-        padding: "1rem",
+        display: "grid",
+        gridTemplateAreas: "'navigation main toc'",
+        gridTemplateColumns: "minmax(0, 15rem) minmax(0, 1fr) minmax(0, 16rem)",
+        gridGap: "2rem",
+        margin: "1rem",
         overflowWrap: "break-word",
-        overflowY: "auto",
       })}
     >
       <div
         className={css({
-          display: "grid",
-          gridTemplateColumns: "minmax(0, 2.5fr) minmax(0, 16rem)",
-          gridGap: "1rem",
-          "& > .contents": {
-            gridColumn: "1 / 2",
-          },
-          "& > .toc-container": {
-            gridColumn: "2 / 3",
-            height: "fit-content",
-            position: "sticky",
-            top: "1rem",
-            padding: "1rem",
-          },
+          display: "contents",
+          zIndex: "auto",
+          ["--offset"]: "2rem",
         })}
-        dangerouslySetInnerHTML={{ __html: html }}
-      />
+      >
+        <aside
+          className={flex({
+            gridArea: "navigation",
+            width: "100%",
+            overflow: "auto",
+            position: "sticky",
+            top: "var(--offset)",
+            maxHeight: "calc(100vh - var(--offset))",
+          })}
+        >
+          <MainNavigation />
+        </aside>
+
+        <aside
+          className={css({
+            gridArea: "toc",
+            position: "sticky",
+            top: "var(--offset)",
+            maxHeight: "calc(100vh - var(--offset))",
+          })}
+          dangerouslySetInnerHTML={{ __html: tocHtml }}
+        />
+      </div>
+
+      <main
+        className={css({
+          gridArea: "main",
+        })}
+      >
+        <article
+          className={css({
+            display: "flex",
+            flexDirection: "column",
+          })}
+          dangerouslySetInnerHTML={{ __html: contentsHtml }}
+        />
+      </main>
     </div>
   );
 }

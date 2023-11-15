@@ -12,11 +12,10 @@ export const MainNavigation = () => {
   //});
 
   return (
-    <aside
+    <div
       className={flex({
         flex: "1 1 auto",
         direction: "column",
-        padding: "2rem",
       })}
     >
       <nav
@@ -67,6 +66,6 @@ export const MainNavigation = () => {
           ))}
         </ul>
       </nav>
-    </aside>
+    </div>
   );
 };

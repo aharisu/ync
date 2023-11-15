@@ -12,69 +12,77 @@ import rehypeSlug from "rehype-slug";
 
 export default async function markdownToHtml(
   markdown: string
-): Promise<string> {
-  const result = await remark()
-    .use(remarkGfm)
-    .use(remarkDirective)
-    .use(myRemarkPlugin)
-    .use(remarkRehype, {
-      allowDangerousHtml: true,
-    })
-    .use(rehypeRaw)
-    .use(rehypeSlug)
+): Promise<[string, string]> {
+  const baseProcessor = () =>
+    remark()
+      .use(remarkGfm)
+      .use(remarkDirective)
+      .use(myRemarkPlugin)
+      .use(remarkRehype, {
+        allowDangerousHtml: true,
+      })
+      .use(rehypeRaw)
+      .use(rehypeSlug);
+
+  const tocHtml = await baseProcessor()
     .use(rehypeToc, {
-      position: "beforeend",
       headings: ["h2", "h3", "h4"],
       customizeTOC: customizeTOC,
     })
+    .use(extractTocPlugin)
+    .use(rehypeStringify)
+    .process(markdown);
+
+  const contentsHtml = await baseProcessor()
     .use(rehypePrism)
     .use(rehypeStringify)
     .process(markdown);
-  return result.toString();
+
+  return [contentsHtml.toString(), tocHtml.toString()];
 }
 
 function customizeTOC(toc: any) {
   try {
     const { children } = toc as any;
     const childrenOfChildren = children?.[0]?.children;
-    if (!children?.length || !childrenOfChildren?.length) return null;
+    if (!children?.length || !childrenOfChildren?.length) return toc;
   } catch (e) {}
   return {
     type: "element",
-    tagName: "aside",
-    properties: { className: "toc-container" },
+    tagName: "section",
+    properties: { className: "toc-section" },
     children: [
       {
         type: "element",
-        tagName: "section",
-        properties: { className: "toc-section" },
+        tagName: "header",
         children: [
           {
             type: "element",
-            tagName: "header",
+            tagName: "h2",
+            properties: { className: "toc-title" },
             children: [
               {
-                type: "element",
-                tagName: "h2",
-                properties: { className: "toc-title" },
-                children: [
-                  {
-                    type: "text",
-                    value: "In this article",
-                  },
-                ],
-              },
-              {
-                type: "element",
-                tagName: "hr",
+                type: "text",
+                value: "In this article",
               },
             ],
           },
-          toc,
+          {
+            type: "element",
+            tagName: "hr",
+          },
         ],
       },
+      toc,
     ],
   } as any;
+}
+
+function extractTocPlugin() {
+  return function (tree: any) {
+    //先頭要素にあるTOC以外の子要素を削除する
+    tree.children.splice(1);
+  };
 }
 
 // This plugin is an example to let users write HTML with directives.

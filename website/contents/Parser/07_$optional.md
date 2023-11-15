@@ -1,5 +1,3 @@
-:::article{.contents}
-
 # $optional
 
 入力が存在しない場合も許可するパーサーを作成します。
@@ -58,5 +56,3 @@ const result = schema.parse({ id: 1 });
 ## オプション
 
 **なし**
-
-:::

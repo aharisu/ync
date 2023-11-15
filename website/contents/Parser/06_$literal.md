@@ -1,5 +1,3 @@
-:::article{.contents}
-
 # $literal
 
 入力が引数で指定されたリテラルと一致することを検証します。
@@ -39,5 +37,3 @@ type Literal = Infer<typeof $literal(true)>;
 ## オプション
 
 **なし**
-
-:::

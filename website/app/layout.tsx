@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import { cx } from "@/styled-system/css";
 import { flex } from "@/styled-system/patterns";
-import { MainNavigation } from "@/components/MainNavigation";
+import { css, cx } from "@/styled-system/css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,54 +21,23 @@ export default function RootLayout({
       <body
         className={cx(
           inter.className,
-          flex({
-            direction: "column",
-            height: "100vh",
-            width: "100vw",
-            overflow: "hidden",
+          css({
+            display: "grid",
+            gridTemplateRows: "auto 1fr auto",
+            minHeight: "100vh",
           })
         )}
       >
         <header
           className={flex({
-            height: "3rem",
-            minHeight: "3rem",
-            maxHeight: "3rem",
-            width: "100%",
             justify: "center",
           })}
         >
           Header
         </header>
-        <div
-          className={flex({
-            flex: "1 1 auto",
-            height: 0,
-          })}
-        >
-          <div
-            className={flex({
-              width: "15rem",
-              minWidth: "15rem",
-              maxWidth: "15rem",
-              overflow: "auto",
-            })}
-          >
-            <MainNavigation />
-          </div>
-          <main
-            className={flex({
-              flex: "1 1 auto",
-            })}
-          >
-            {children}
-          </main>
-        </div>
+        <div>{children}</div>
         <footer
           className={flex({
-            height: "1.5rem",
-            minHeight: "1.5rem",
-            maxHeight: "1.5rem",
             width: "100%",
             justify: "center",
             background: "var(--background-secondary)",
